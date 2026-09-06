@@ -8,7 +8,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="Favicon.png">
 
-    <!-- Importação das fontes de escrita à mão do Google Fonts -->
+    <!-- Importação das fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Indie+Flower&family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     
     <!-- Firebase SDKs -->
@@ -30,7 +30,6 @@
             align-items: center;
         }
 
-        /* Remover as setinhas de incremento dos inputs numéricos */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
@@ -45,41 +44,14 @@
             text-transform: uppercase;
         }
 
-        /* Classes dinâmicas para o tipo de letra manuscrita */
-        body.fonte-padrao .main-table td {
-            font-family: Arial, Helvetica, sans-serif !important;
-            font-size: 10px !important;
-            font-weight: normal !important;
-        }
+        /* Tipografia para a folha A4 */
+        body.fonte-padrao .main-table td { font-family: Arial, Helvetica, sans-serif !important; font-size: 10px !important; }
+        body.fonte-caveat .main-table td { font-family: 'Caveat', cursive !important; font-size: 13.5px !important; }
+        body.fonte-kalam .main-table td { font-family: 'Kalam', cursive !important; font-size: 11.5px !important; }
+        body.fonte-indie .main-table td { font-family: 'Indie Flower', cursive !important; font-size: 12px !important; }
+        body.fonte-patrick .main-table td { font-family: 'Patrick Hand', cursive !important; font-size: 12px !important; letter-spacing: 0.8px !important; }
 
-        body.fonte-caveat .main-table td {
-            font-family: 'Caveat', cursive !important;
-            font-size: 13.5px !important;
-            font-weight: normal !important;
-        }
-
-        body.fonte-kalam .main-table td {
-            font-family: 'Kalam', cursive !important;
-            font-size: 11.5px !important;
-            font-weight: normal !important;
-        }
-
-        body.fonte-indie .main-table td {
-            font-family: 'Indie Flower', cursive !important;
-            font-size: 12px !important;
-            font-weight: normal !important;
-        }
-
-        body.fonte-patrick .main-table td {
-            font-family: 'Patrick Hand', cursive !important;
-            font-size: 12px !important;
-            font-weight: normal !important;
-            letter-spacing: 0.8px !important;
-        }
-
-        /* ----------------------------------------------------
-           PAINEL DE INTRODUÇÃO DE DADOS (ADAPTÁVEL)
-        ---------------------------------------------------- */
+        /* PAINEL DE CONTROLO / FORMULÁRIO */
         .interactive-panel {
             background: #ffffff;
             border: 2px solid #cbd5e1;
@@ -158,39 +130,16 @@
             height: 32px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
+        .btn:hover { opacity: 0.9; }
+        .btn-inserir { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; width: 100%; }
+        .btn-verde-suave { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .btn-violeta-suave { background-color: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
 
-        .btn-inserir {
-            background-color: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            width: 100%;
-        }
-
-        .btn-verde-suave {
-            background-color: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-
-        .btn-violeta-suave {
-            background-color: #f8fafc;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-
-        /* ----------------------------------------------------
-           MODAIS PERSONALIZADOS
-        ---------------------------------------------------- */
+        /* MODAIS */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(15, 23, 42, 0.4);
             z-index: 9999;
             justify-content: center;
@@ -209,59 +158,14 @@
             width: 100%;
         }
 
-        .modal-box p {
-            font-size: 14px;
-            font-weight: bold;
-            color: #334155;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
+        .modal-box p { font-size: 14px; font-weight: bold; color: #334155; margin-top: 0; margin-bottom: 15px; }
+        .modal-box input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; margin-bottom: 20px; outline: none; text-align: center; color: #334155; background-color: #f8fafc; }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+        .modal-btn { padding: 8px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; border: none; font-size: 13px; }
+        .modal-btn-sim, .modal-btn-ok { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; width: 100%; }
+        .modal-btn-nao { background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca; width: 100%; }
 
-        .modal-box input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            outline: none;
-            text-align: center;
-            color: #334155;
-            background-color: #f8fafc;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .modal-btn {
-            padding: 8px 20px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            font-size: 13px;
-        }
-
-        .modal-btn-sim, .modal-btn-ok {
-            background-color: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            width: 100%;
-        }
-
-        .modal-btn-nao {
-            background-color: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            width: 100%;
-        }
-
-        /* ----------------------------------------------------
-           FOLHA DE REGISTO (COM SUPORTE RESPONSIVO MÓVEL)
-        ---------------------------------------------------- */
+        /* FOLHA A4 TRADICIONAL (PC) */
         .page-container {
             width: 100%;
             max-width: 297mm;
@@ -281,7 +185,6 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            transform-origin: top left;
         }
 
         .master-box {
@@ -301,21 +204,8 @@
             gap: 10px;
         }
 
-        .mod-tag {
-            font-size: 10px;
-            font-weight: bold;
-            color: #475569;
-        }
-
-        .year-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 1px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #334155;
-        }
+        .mod-tag { font-size: 10px; font-weight: bold; color: #475569; }
+        .year-title { font-size: 16px; font-weight: bold; margin-top: 1px; display: flex; align-items: center; gap: 6px; color: #334155; }
 
         #txt_mes_atual {
             border: 1px dashed #94a3b8;
@@ -366,27 +256,9 @@
             align-items: center;
             gap: 4px;
         }
-
-        .header-field:last-child {
-            border-right: none;
-        }
-
-        .header-field label {
-            font-size: 10.5px;
-            font-weight: bold;
-            white-space: nowrap;
-            color: #334155;
-        }
-
-        .header-field input {
-            border: none;
-            background: transparent;
-            font-weight: bold;
-            font-size: 11px;
-            outline: none;
-            text-align: center;
-            color: #1e293b;
-        }
+        .header-field:last-child { border-right: none; }
+        .header-field label { font-size: 10.5px; font-weight: bold; white-space: nowrap; color: #334155; }
+        .header-field input { border: none; background: transparent; font-weight: bold; font-size: 11px; outline: none; text-align: center; color: #1e293b; }
 
         .main-table {
             width: 100%;
@@ -403,77 +275,110 @@
             height: 18px;
         }
 
-        .main-table th {
-            background-color: #f1f5f9;
-            font-weight: bold;
+        .main-table th { background-color: #f1f5f9; font-weight: bold; color: #334155; }
+        .main-table td { vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b; }
+
+        /* -----------------------------------------------------------------
+           VERSÃO MÓVEL (EXCLUSIVA PARA TELEMÓVEIS)
+           Converte a folha numa interface limpa estilo App Mobile
+        ----------------------------------------------------------------- */
+        .mobile-view-container {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .mobile-view-container h4 {
+            margin: 0 0 10px 0;
             color: #334155;
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .main-table td {
-            vertical-align: middle;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #1e293b;
+        .mobile-card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 350px;
+            overflow-y: auto;
         }
 
-        /* Adaptação inteligente para ecrãs pequenos (Telemóveis) */
-        @media screen and (max-width: 1150px) {
+        .mobile-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 12px;
+            color: #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mobile-card-info strong { color: #0f172a; }
+
+        /* Botão flutuante ou de destaque para alternar visualização no telemóvel */
+        .btn-toggle-view {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        @media screen and (max-width: 900px) {
+            /* No telemóvel, escondemos a folha gigante A4 por defeito e mostramos o painel mobile */
             .page-container {
-                height: 140vw; /* Ajusta o espaço vertical proporcionalmente no telemóvel */
-                max-height: 210mm;
+                display: none;
             }
-            .page {
-                transform: scale(0.38); /* Reduz a folha na horizontal para encaixar sem cortes laterais */
+            .mobile-view-container {
+                display: block;
             }
-        }
-
-        @media screen and (max-width: 480px) {
-            .page {
-                transform: scale(0.31);
+            /* Se o utilizador clicar para ver a folha A4 completa */
+            body.mostrar-modo-a4 .page-container {
+                display: flex;
             }
-            .page-container {
-                height: 115vw;
+            body.mostrar-modo-a4 .mobile-view-container {
+                display: none;
             }
         }
 
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
+        @page { size: A4 landscape; margin: 0; }
 
         @media print {
             html, body {
-                width: 297mm;
-                height: 210mm;
-                background: white;
-                margin: 0 !important;
-                padding: 0 !important;
+                width: 297mm; height: 210mm; background: white; margin: 0 !important; padding: 0 !important;
             }
-
-            .interactive-panel, .modal-overlay {
+            .interactive-panel, .modal-overlay, .mobile-view-container, .btn-toggle-view {
                 display: none !important;
             }
-
             .page-container {
-                width: 297mm !important;
-                height: 210mm !important;
-                overflow: visible !important;
+                display: flex !important; width: 297mm !important; height: 210mm !important; overflow: visible !important;
             }
-
             .page {
-                transform: scale(1) !important;
-                box-shadow: none !important;
-                border: none !important;
-                width: 297mm !important;
-                height: 210mm !important;
-                margin: 0 !important;
+                box-shadow: none !important; border: none !important; width: 297mm !important; height: 210mm !important; margin: 0 !important;
             }
-
-            #txt_mes_atual {
-                border: none !important;
-                background: transparent !important;
-            }
+            #txt_mes_atual { border: none !important; background: transparent !important; }
         }
     </style>
 </head>
@@ -574,7 +479,7 @@
         </div>
     </div>
 
-    <!-- Painel de Controlo -->
+    <!-- Painel de Controlo / Registo -->
     <div class="interactive-panel">
         <h3>
             <span>Registo de Gasóleo</span>
@@ -643,7 +548,19 @@
         </form>
     </div>
 
-    <!-- Visualização da Folha -->
+    <!-- VISUALIZAÇÃO MÓVEL (Exclusiva para telemóveis) -->
+    <div class="mobile-view-container">
+        <h4>
+            <span>Registos Recentes (Mobile)</span>
+            <span id="mobile_total_reg" style="font-size: 11px; color: #64748b;">0 registos</span>
+        </h4>
+        <div class="mobile-card-list" id="mobileCardList">
+            <!-- Os cartões são injetados aqui automaticamente -->
+        </div>
+        <button class="btn-toggle-view" onclick="alternarModoA4Mobile()">Ver Folha Oficial A4 / Imprimir</button>
+    </div>
+
+    <!-- VISUALIZAÇÃO DA FOLHA A4 TRADICIONAL -->
     <div class="page-container">
         <div class="page">
             <div class="master-box">
@@ -701,6 +618,9 @@
                 </table>
             </div>
         </div>
+        <div style="text-align: center; margin-top: 10px;">
+            <button class="btn" style="background:#334155; color:white;" onclick="alternarModoA4Mobile()">Voltar ao Painel Móvel</button>
+        </div>
     </div>
 
     <script>
@@ -743,9 +663,11 @@
             gravarDadosAutomatico();
         }
 
-        function validarNumeroPositivo(input) {
-            if (input.value < 0) input.value = '';
+        function alternarModoA4Mobile() {
+            document.body.classList.toggle('mostrar-modo-a4');
         }
+
+        function validarNumeroPositivo(input) { if (input.value < 0) input.value = ''; }
 
         function validarGasoleo(input) {
             if (input.value < 0) { input.value = ''; return; }
@@ -755,10 +677,7 @@
             }
         }
 
-        function fecharLimiteGasoleo() {
-            document.getElementById('modalLimiteGasoleo').style.display = 'none';
-            document.getElementById('in_gasoleo').focus();
-        }
+        function fecharLimiteGasoleo() { document.getElementById('modalLimiteGasoleo').style.display = 'none'; document.getElementById('in_gasoleo').focus(); }
 
         function validarAdblue(input) {
             if (input.value < 0) { input.value = ''; return; }
@@ -768,14 +687,8 @@
             }
         }
 
-        function fecharLimiteAdblue() {
-            document.getElementById('modalLimiteAdblue').style.display = 'none';
-            document.getElementById('in_adblue').focus();
-        }
-
-        function validarApenasLetras(input) {
-            input.value = input.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\s-]/g, '');
-        }
+        function fecharLimiteAdblue() { document.getElementById('modalLimiteAdblue').style.display = 'none'; document.getElementById('in_adblue').focus(); }
+        function validarApenasLetras(input) { input.value = input.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\s-]/g, ''); }
 
         function aplicarMascaraMatricula(input) {
             let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -786,9 +699,7 @@
             input.value = formatado;
         }
 
-        function atualizarCorSelect(selectObj) {
-            selectObj.style.color = selectObj.value === "" ? "#94a3b8" : "#334155";
-        }
+        function atualizarCorSelect(selectObj) { selectObj.style.color = selectObj.value === "" ? "#94a3b8" : "#334155"; }
 
         function tratarSelecaoLugar(selectObj) {
             const inputManual = document.getElementById('in_lugar_manual');
@@ -799,16 +710,9 @@
             atualizarCorSelect(selectObj);
 
             if (valor === 'OUTRO') {
-                inputManual.style.display = 'block';
-                inputManual.required = true;
-                inputManual.focus();
-                inputManual.value = '';
-                inputEstacao.value = '';
-                inputCartao.value = 'Nakanoil';
+                inputManual.style.display = 'block'; inputManual.required = true; inputManual.focus(); inputManual.value = ''; inputEstacao.value = ''; inputCartao.value = 'Nakanoil';
             } else {
-                inputManual.style.display = 'none';
-                inputManual.required = false;
-                inputManual.value = '';
+                inputManual.style.display = 'none'; inputManual.required = false; inputManual.value = '';
                 if (valor === 'Badajoz') { inputEstacao.value = 'Nakanoil'; inputCartao.value = 'Nakanoil'; }
                 else if (valor === 'Vila Franca') { inputEstacao.value = 'Qfuel'; inputCartao.value = 'Nakanoil'; }
                 else if (valor === 'Salamanca') { inputEstacao.value = 'Gasoliva'; inputCartao.value = 'Nakanoil'; }
@@ -822,17 +726,14 @@
             const chave = 'tec_ultimo_mes_registado';
             const atualStr = `${hoje.getMonth()}-${hoje.getFullYear()}`;
             const salvo = localStorage.getItem(chave);
-            if (!salvo) {
-                localStorage.setItem(chave, atualStr);
-            } else if (salvo !== atualStr) {
+            if (!salvo) localStorage.setItem(chave, atualStr);
+            else if (salvo !== atualStr) {
                 document.getElementById('modalAlertaMudancaMes').style.display = 'flex';
                 localStorage.setItem(chave, atualStr);
             }
         }
 
-        function fecharAlertaMudancaMes() {
-            document.getElementById('modalAlertaMudancaMes').style.display = 'none';
-        }
+        function fecharAlertaMudancaMes() { document.getElementById('modalAlertaMudancaMes').style.display = 'none'; }
 
         function inicializarOuvinteFirebase() {
             dbRef.on('value', (snapshot) => {
@@ -851,7 +752,7 @@
                     }
 
                     while(dadosPreenchidos.length < TOTAL_LINHAS) dadosPreenchidos.push(["","","","","","","","","","",""]);
-                    renderizarTabela();
+                    renderizarTabelas();
                     recalcularUltimosKmsCabecalho();
                     setTimeout(() => { atualizandoRemotamente = false; }, 200);
                 } else {
@@ -859,7 +760,7 @@
                     document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
                     document.body.className = 'fonte-patrick';
                     document.getElementById('select_fonte').value = 'fonte-patrick';
-                    renderizarTabela();
+                    renderizarTabelas();
                 }
             });
         }
@@ -875,12 +776,16 @@
         atualizarCorSelect(document.getElementById('in_lugar_select'));
 
         const tbody = document.querySelector('#tabelaOriginal tbody');
+        const mobileCardList = document.getElementById('mobileCardList');
 
-        function renderizarTabela() {
+        function renderizarTabelas() {
+            // 1. Renderizar Tabela A4 Tradicional
             tbody.innerHTML = '';
+            let totalRegs = 0;
             for (let i = 0; i < TOTAL_LINHAS; i++) {
                 const tr = document.createElement('tr');
                 const rowData = dadosPreenchidos[i] || ["","","","","","","","","","",""];
+                if(rowData[0] || rowData[1] || rowData[8]) totalRegs++;
                 tr.innerHTML = `
                     <td>${rowData[0]}</td><td>${rowData[1]}</td><td>${rowData[2]}</td><td>${rowData[3]}</td>
                     <td>${rowData[4]}</td><td>${rowData[5]}</td><td>${rowData[6]}</td><td>${rowData[7]}</td>
@@ -888,6 +793,27 @@
                 `;
                 tbody.appendChild(tr);
             }
+
+            // 2. Renderizar Cartões Telemóvel
+            mobileCardList.innerHTML = '';
+            let contadorCards = 0;
+            for (let i = TOTAL_LINHAS - 1; i >= 0; i--) {
+                const r = dadosPreenchidos[i];
+                if (r && (r[0] || r[1] || r[8])) {
+                    contadorCards++;
+                    const div = document.createElement('div');
+                    div.className = 'mobile-card';
+                    div.innerHTML = `
+                        <div class="mobile-card-info">
+                            <strong>${r[0] || '-'} | ${r[1] || 'Lugar N/D'}</strong>
+                            <span>Posto: ${r[2] || '-'} | Gasóleo: ${r[5] || '0'} L</span>
+                            <span>Kms: ${r[8] || '-'} ${r[4] ? '| Adblue: ' + r[4] + 'L' : ''}</span>
+                        </div>
+                    `;
+                    mobileCardList.appendChild(div);
+                }
+            }
+            document.getElementById('mobile_total_reg').innerText = `${contadorCards} registos`;
         }
 
         function recalcularUltimosKmsCabecalho() {
@@ -1019,7 +945,7 @@
             ];
 
             pilhaHistoricoRemocoes = [];
-            renderizarTabela();
+            renderizarTabelas();
             recalcularUltimosKmsCabecalho();
             gravarDadosAutomatico();
 
@@ -1043,7 +969,7 @@
             if (ultima === -1) { alert("Sem linhas para apagar."); return; }
             pilhaHistoricoRemocoes.push({ indice: ultima, dados: [...dadosPreenchidos[ultima]] });
             dadosPreenchidos[ultima] = ["","","","","","","","","","",""];
-            renderizarTabela();
+            renderizarTabelas();
             recalcularUltimosKmsCabecalho();
             gravarDadosAutomatico();
         }
@@ -1052,7 +978,7 @@
             if (pilhaHistoricoRemocoes.length === 0) { document.getElementById('modalSemHistorico').style.display = 'flex'; return; }
             const ultima = pilhaHistoricoRemocoes.pop();
             dadosPreenchidos[ultima.indice] = [...ultima.dados];
-            renderizarTabela();
+            renderizarTabelas();
             recalcularUltimosKmsCabecalho();
             gravarDadosAutomatico();
         }
@@ -1077,7 +1003,7 @@
             if (sim) {
                 inicializarVazio();
                 pilhaHistoricoRemocoes = [];
-                renderizarTabela();
+                renderizarTabelas();
                 document.getElementById('head_ultimos_kms').value = '';
                 document.getElementById('txt_assinatura').value = '';
                 document.getElementById('txt_matricula').value = '';
