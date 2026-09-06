@@ -4,8 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mod. 06/20 - T.E.C., LDA</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Favicon.png">
+
     <!-- Importação das fontes de escrita à mão do Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Indie+Flower&family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -688,7 +697,7 @@
             <div class="actions">
                 <button type="button" class="btn btn-verde-suave" onclick="apagarUltimaLinha()">Apagar</button>
                 <button type="button" class="btn btn-verde-suave" onclick="voltarInsercao()">Voltar</button>
-                <button type="button" class="btn btn-violeta-suave" onclick="gravarDados()" style="margin-left: auto;">Gravar</button>
+                <button type="button" class="btn btn-violeta-suave" onclick="gravarDados()" style="margin-left: auto;">Sincronizado</button>
                 <button type="button" class="btn btn-violeta-suave" onclick="imprimirFolha()">Imprimir</button>
                 <button type="button" class="btn btn-violeta-suave" onclick="limparFolha()">Limpar</button>
             </div>
@@ -753,10 +762,26 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE (Insira os dados da sua base de dados)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_MESSAGING_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const dbRef = db.ref('registo_gasoleo/dados_atuais');
+
         const TOTAL_LINHAS = 28;
         let dadosPreenchidos = [];
         let pilhaHistoricoRemocoes = [];
         let adbluePendenteFluxo = 0;
+        let atualizandoRemotamente = false;
 
         function definirDataAtual() {
             const hoje = new Date();
@@ -930,11 +955,11 @@
             }
         }
 
-        function carregarEstadoSalvo() {
-            const salvo = localStorage.getItem('tec_dados_viagem');
-            if (salvo) {
-                try {
-                    const obj = JSON.parse(salvo);
+        function inicializarOuvinteFirebase() {
+            dbRef.on('value', (snapshot) => {
+                const obj = snapshot.val();
+                if (obj) {
+                    atualizandoRemotamente = true;
                     dadosPreenchidos = obj.tabela || [];
                     document.getElementById('txt_assinatura').value = (obj.assinatura || '').toUpperCase();
                     document.getElementById('txt_matricula').value = (obj.matricula || '').toUpperCase();
@@ -946,26 +971,23 @@
                     if (obj.fonteSelecionada) {
                         document.body.className = obj.fonteSelecionada;
                         document.getElementById('select_fonte').value = obj.fonteSelecionada;
-                    } else {
-                        document.body.className = 'fonte-patrick';
-                        document.getElementById('select_fonte').value = 'fonte-patrick';
                     }
-                } catch(e) {
+
+                    while(dadosPreenchidos.length < TOTAL_LINHAS) {
+                        dadosPreenchidos.push(["","","","","","","","","","",""]);
+                    }
+
+                    renderizarTabela();
+                    recalcularUltimosKmsCabecalho();
+                    setTimeout(() => { atualizandoRemotamente = false; }, 200);
+                } else {
                     inicializarVazio();
                     document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
                     document.body.className = 'fonte-patrick';
                     document.getElementById('select_fonte').value = 'fonte-patrick';
+                    renderizarTabela();
                 }
-            } else {
-                inicializarVazio();
-                document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
-                document.body.className = 'fonte-patrick';
-                document.getElementById('select_fonte').value = 'fonte-patrick';
-            }
-            while(dadosPreenchidos.length < TOTAL_LINHAS) {
-                dadosPreenchidos.push(["","","","","","","","","","",""]);
-            }
-            recalcularUltimosKmsCabecalho();
+            });
         }
 
         function inicializarVazio() {
@@ -975,9 +997,9 @@
             }
         }
 
-        carregarEstadoSalvo();
         definirDataAtual();
         verificarMudancaMesAno();
+        inicializarOuvinteFirebase();
         
         const selectLugarEl = document.getElementById('in_lugar_select');
         atualizarCorSelect(selectLugarEl);
@@ -1005,8 +1027,6 @@
                 tbody.appendChild(tr);
             }
         }
-        
-        renderizarTabela();
 
         function recalcularUltimosKmsCabecalho() {
             let ultimoKmValido = "";
@@ -1157,8 +1177,6 @@
             document.getElementById('txt_matricula').value = val.toUpperCase();
             document.getElementById('modalPedirMatricula').style.display = 'none';
             gravarDadosAutomatico();
-            
-            // Prosseguir para verificar assinatura ou inserir
             verificarDadosCabecalhoEInserir();
         }
 
@@ -1171,8 +1189,6 @@
             document.getElementById('txt_assinatura').value = val.toUpperCase();
             document.getElementById('modalPedirAssinatura').style.display = 'none';
             gravarDadosAutomatico();
-            
-            // Inserir viagem final
             executarInsercaoFinal(adbluePendenteFluxo);
         }
 
@@ -1284,20 +1300,13 @@
         }
 
         function gravarDados() {
-            const payload = {
-                tabela: dadosPreenchidos,
-                assinatura: document.getElementById('txt_assinatura').value,
-                matricula: document.getElementById('txt_matricula').value,
-                ultimosKms: document.getElementById('head_ultimos_kms').value,
-                mesAtual: document.getElementById('txt_mes_atual').value,
-                fonteSelecionada: document.body.className
-            };
-            localStorage.setItem('tec_dados_viagem', JSON.stringify(payload));
+            gravarDadosAutomatico();
             pilhaHistoricoRemocoes = [];
-            alert("Dados gravados com sucesso!");
+            alert("Dados sincronizados na nuvem com sucesso!");
         }
 
         function gravarDadosAutomatico() {
+            if (atualizandoRemotamente) return;
             const payload = {
                 tabela: dadosPreenchidos,
                 assinatura: document.getElementById('txt_assinatura').value,
@@ -1306,7 +1315,7 @@
                 mesAtual: document.getElementById('txt_mes_atual').value,
                 fonteSelecionada: document.body.className
             };
-            localStorage.setItem('tec_dados_viagem', JSON.stringify(payload));
+            dbRef.set(payload);
         }
 
         function imprimirFolha() {
@@ -1321,7 +1330,6 @@
             document.getElementById('modalLimpar').style.display = 'none';
 
             if (escolheuSim) {
-                localStorage.removeItem('tec_dados_viagem');
                 inicializarVazio();
                 pilhaHistoricoRemocoes = [];
                 renderizarTabela();
@@ -1346,6 +1354,7 @@
                 document.getElementById('in_adblue').value = '';
                 
                 definirDataAtual();
+                gravarDadosAutomatico();
             }
         }
 
