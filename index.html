@@ -4,8 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mod. 06/20 - T.E.C., LDA</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Favicon.png">
+
     <!-- Importação das fontes de escrita à mão do Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Indie+Flower&family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -15,56 +24,50 @@
         body {
             background-color: #f1f3f6;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Remover as setinhas de incremento dos inputs numéricos (Chrome, Safari, Edge, Opera) */
+        /* Remover as setinhas de incremento dos inputs numéricos */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
             margin: 0; 
         }
 
-        /* Remover as setinhas de incremento no Firefox */
         input[type=number] {
             -moz-appearance: textfield;
         }
 
-        /* Forçar letras maiúsculas em campos específicos */
         .maiusculas {
             text-transform: uppercase;
         }
 
-        /* Classes dinâmicas para o tipo de letra manuscrita (Apenas afeta as células da tabela principal) */
+        /* Classes dinâmicas para o tipo de letra manuscrita */
         body.fonte-padrao .main-table td {
             font-family: Arial, Helvetica, sans-serif !important;
             font-size: 10px !important;
             font-weight: normal !important;
-            letter-spacing: normal !important;
         }
 
         body.fonte-caveat .main-table td {
             font-family: 'Caveat', cursive !important;
             font-size: 13.5px !important;
             font-weight: normal !important;
-            letter-spacing: normal !important;
         }
 
         body.fonte-kalam .main-table td {
             font-family: 'Kalam', cursive !important;
             font-size: 11.5px !important;
             font-weight: normal !important;
-            letter-spacing: normal !important;
         }
 
         body.fonte-indie .main-table td {
             font-family: 'Indie Flower', cursive !important;
             font-size: 12px !important;
             font-weight: normal !important;
-            letter-spacing: normal !important;
         }
 
         body.fonte-patrick .main-table td {
@@ -75,15 +78,16 @@
         }
 
         /* ----------------------------------------------------
-           MENU INTERATIVO / PAINEL DE INTRODUÇÃO DE DADOS
+           PAINEL DE INTRODUÇÃO DE DADOS (ADAPTÁVEL)
         ---------------------------------------------------- */
         .interactive-panel {
             background: #ffffff;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
-            padding: 15px 20px;
-            width: 297mm;
-            margin-bottom: 25px;
+            padding: 15px;
+            width: 100%;
+            max-width: 297mm;
+            margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.06);
         }
 
@@ -92,10 +96,12 @@
             color: #334155;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 6px;
-            font-size: 16px;
+            font-size: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .form-grid {
@@ -125,48 +131,20 @@
             font-size: 13px;
             outline: none;
             background-color: #f8fafc;
-            height: 32px;
+            height: 34px;
             color: #334155;
-            font-weight: normal;
-        }
-
-        .form-group input::placeholder {
-            color: #94a3b8;
-            font-weight: normal;
-        }
-
-        .form-group input[type="date"], 
-        .form-group select {
-            color: #334155;
-            font-weight: normal;
-        }
-
-        .form-group select option[value=""] {
-            color: #94a3b8;
-        }
-        
-        .form-group select:invalid {
-            color: #94a3b8;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: #94a3b8;
-            background-color: #ffffff;
-            color: #334155;
-            font-weight: normal;
-            box-shadow: 0 0 0 2px rgba(226, 232, 240, 0.5);
         }
 
         .actions {
             margin-top: 15px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .btn {
             border: none;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
@@ -177,7 +155,7 @@
             gap: 6px;
             background-color: #e2e8f0;
             color: #475569;
-            height: 30px;
+            height: 32px;
         }
 
         .btn:hover {
@@ -191,17 +169,10 @@
             width: 100%;
         }
 
-        .btn-inserir:hover {
-            background-color: #dcfce7;
-        }
-
         .btn-verde-suave {
             background-color: #f0fdf4;
             color: #166534;
             border: 1px solid #bbf7d0;
-        }
-        .btn-verde-suave:hover {
-            background-color: #dcfce7;
         }
 
         .btn-violeta-suave {
@@ -209,12 +180,9 @@
             color: #475569;
             border: 1px solid #cbd5e1;
         }
-        .btn-violeta-suave:hover {
-            background-color: #f1f5f9;
-        }
 
         /* ----------------------------------------------------
-           MODAIS PERSONALIZADOS AO CENTRO (FLUTUANTES)
+           MODAIS PERSONALIZADOS
         ---------------------------------------------------- */
         .modal-overlay {
             display: none;
@@ -227,11 +195,12 @@
             z-index: 9999;
             justify-content: center;
             align-items: center;
+            padding: 15px;
         }
 
         .modal-box {
             background: #ffffff;
-            padding: 20px 25px;
+            padding: 20px;
             border-radius: 8px;
             border: 1px solid #cbd5e1;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -246,7 +215,6 @@
             color: #334155;
             margin-top: 0;
             margin-bottom: 15px;
-            line-height: 1.4;
         }
 
         .modal-box input {
@@ -258,13 +226,8 @@
             margin-bottom: 20px;
             outline: none;
             text-align: center;
-            font-weight: normal;
             color: #334155;
             background-color: #f8fafc;
-        }
-
-        .modal-box input::placeholder {
-            color: #94a3b8;
         }
 
         .modal-buttons {
@@ -282,40 +245,31 @@
             font-size: 13px;
         }
 
-        .modal-btn-sim {
-            background-color: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-
-        .modal-btn-sim:hover {
-            background-color: #dcfce7;
-        }
-
-        .modal-btn-nao {
-            background-color: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .modal-btn-nao:hover {
-            background-color: #fee2e2;
-        }
-
-        .modal-btn-ok {
+        .modal-btn-sim, .modal-btn-ok {
             background-color: #f0fdf4;
             color: #166534;
             border: 1px solid #bbf7d0;
             width: 100%;
         }
 
-        .modal-btn-ok:hover {
-            background-color: #dcfce7;
+        .modal-btn-nao {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            width: 100%;
         }
 
         /* ----------------------------------------------------
-           FOLHA DE REGISTO (LAYOUT ORIGINAL MODELO 06/20)
+           FOLHA DE REGISTO (COM SUPORTE RESPONSIVO MÓVEL)
         ---------------------------------------------------- */
+        .page-container {
+            width: 100%;
+            max-width: 297mm;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+
         .page {
             background: white;
             width: 297mm;
@@ -325,9 +279,9 @@
             border: 1px solid #cbd5e1;
             position: relative;
             box-sizing: border-box;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+            transform-origin: top left;
         }
 
         .master-box {
@@ -344,6 +298,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 4px;
+            gap: 10px;
         }
 
         .mod-tag {
@@ -376,12 +331,6 @@
             position: relative;
             left: 5mm;
             top: -3.5px;
-            font-family: Arial, Helvetica, sans-serif !important;
-        }
-
-        #txt_mes_atual:focus {
-            background: #fff;
-            border-color: #475569;
         }
 
         .header-logo-container {
@@ -396,10 +345,9 @@
         .header-logo-container img {
             height: 44px;
             width: 100%;
-            max-width: none;
-            object-fit: fill;
-            opacity: 0.65;
-            filter: brightness(1.2) contrast(0.9);
+            max-width: 180px;
+            object-fit: contain;
+            opacity: 0.75;
         }
 
         .header-box-group {
@@ -408,6 +356,7 @@
             border-radius: 4px;
             overflow: hidden;
             background-color: #f8fafc;
+            flex-wrap: wrap;
         }
 
         .header-field {
@@ -437,18 +386,6 @@
             outline: none;
             text-align: center;
             color: #1e293b;
-            font-family: Arial, Helvetica, sans-serif !important;
-        }
-
-        #txt_assinatura, #txt_matricula {
-            font-weight: bold !important;
-            color: #1e293b !important;
-        }
-
-        .header-field input::placeholder {
-            color: #94a3b8;
-            font-weight: normal;
-            font-size: 11px;
         }
 
         .main-table {
@@ -469,10 +406,7 @@
         .main-table th {
             background-color: #f1f5f9;
             font-weight: bold;
-            text-align: center;
-            font-size: 10px;
             color: #334155;
-            font-family: Arial, Helvetica, sans-serif !important;
         }
 
         .main-table td {
@@ -480,9 +414,27 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-align: center;
             color: #1e293b;
-            font-weight: normal;
+        }
+
+        /* Adaptação inteligente para ecrãs pequenos (Telemóveis) */
+        @media screen and (max-width: 1150px) {
+            .page-container {
+                height: 140vw; /* Ajusta o espaço vertical proporcionalmente no telemóvel */
+                max-height: 210mm;
+            }
+            .page {
+                transform: scale(0.38); /* Reduz a folha na horizontal para encaixar sem cortes laterais */
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .page {
+                transform: scale(0.31);
+            }
+            .page-container {
+                height: 115vw;
+            }
         }
 
         @page {
@@ -503,27 +455,31 @@
                 display: none !important;
             }
 
-            #txt_mes_atual {
-                border: none !important;
-                background: transparent !important;
+            .page-container {
+                width: 297mm !important;
+                height: 210mm !important;
+                overflow: visible !important;
             }
 
             .page {
+                transform: scale(1) !important;
                 box-shadow: none !important;
                 border: none !important;
                 width: 297mm !important;
                 height: 210mm !important;
-                padding: 6mm 8mm 6mm 8mm !important;
                 margin: 0 !important;
-                page-break-after: avoid;
-                page-break-before: avoid;
+            }
+
+            #txt_mes_atual {
+                border: none !important;
+                background: transparent !important;
             }
         }
     </style>
 </head>
 <body class="fonte-patrick">
 
-    <!-- Modal de Confirmação: Meteu Adblue? (Sim / Não) -->
+    <!-- Modais -->
     <div id="modalAdblue" class="modal-overlay">
         <div class="modal-box">
             <p>Meteu Adblue?</p>
@@ -534,7 +490,6 @@
         </div>
     </div>
 
-    <!-- Modal de Aviso Central: Lembre-se de inserir os litros de Adblue -->
     <div id="modalAvisoAdblue" class="modal-overlay">
         <div class="modal-box">
             <p>Lembre-se de inserir os litros de Adblue.</p>
@@ -544,7 +499,6 @@
         </div>
     </div>
 
-    <!-- Modal de Limite Máximo de Adblue (Flutuante com OK) -->
     <div id="modalLimiteAdblue" class="modal-overlay">
         <div class="modal-box">
             <p>Atenção: O limite máximo para o Adblue é de 80 litros!</p>
@@ -554,7 +508,6 @@
         </div>
     </div>
 
-    <!-- Modal de Limite Máximo de Gasóleo (Flutuante com OK) -->
     <div id="modalLimiteGasoleo" class="modal-overlay">
         <div class="modal-box">
             <p>Atenção: O limite máximo do depósito de gasóleo é de 950 litros!</p>
@@ -564,17 +517,15 @@
         </div>
     </div>
 
-    <!-- Modal de Erro / Aviso de KMS (Flutuante com OK) -->
     <div id="modalErroKms" class="modal-overlay">
         <div class="modal-box">
-            <p id="textoErroKms">Não autorizado a colocar os mesmos kms !!!!</p>
+            <p id="textoErroKms">Erro nos KMS</p>
             <div class="modal-buttons">
                 <button class="modal-btn modal-btn-ok" onclick="fecharErroKms()">OK</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal para Pedir a Matrícula caso esteja vazia -->
     <div id="modalPedirMatricula" class="modal-overlay">
         <div class="modal-box">
             <p>Insira a matrícula do camião:</p>
@@ -585,7 +536,6 @@
         </div>
     </div>
 
-    <!-- Modal para Pedir a Assinatura caso esteja vazia -->
     <div id="modalPedirAssinatura" class="modal-overlay">
         <div class="modal-box">
             <p>Insira o nome do motorista:</p>
@@ -596,7 +546,6 @@
         </div>
     </div>
 
-    <!-- Modal de Aviso: Não há nenhuma linha apagada recentemente para repor -->
     <div id="modalSemHistorico" class="modal-overlay">
         <div class="modal-box">
             <p>Não há nenhuma linha apagada recentemente para repor.</p>
@@ -606,7 +555,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação: Limpar Folha (Sim / Não) -->
     <div id="modalLimpar" class="modal-overlay">
         <div class="modal-box">
             <p>Tem a certeza que deseja limpar toda a folha e o menu de registo?</p>
@@ -617,16 +565,16 @@
         </div>
     </div>
 
-    <!-- Modal de Alerta / Lembrete de Mudança de Mês e Ano -->
     <div id="modalAlertaMudancaMes" class="modal-overlay">
         <div class="modal-box">
-            <p>Atenção: Estamos num novo mês/ano! Lembre-se de alterar o Mês e o Ano no campo próprio do layout antes de continuar.</p>
+            <p>Atenção: Novo mês/ano detetado! Lembre-se de atualizar o campo respetivo no layout.</p>
             <div class="modal-buttons">
                 <button class="modal-btn modal-btn-ok" onclick="fecharAlertaMudancaMes()">OK</button>
             </div>
         </div>
     </div>
 
+    <!-- Painel de Controlo -->
     <div class="interactive-panel">
         <h3>
             <span>Registo de Gasóleo</span>
@@ -647,7 +595,7 @@
                         <option value="Salamanca">Salamanca</option>
                         <option value="Castelo Branco">Castelo Branco</option>
                         <option value="Proença-a-Nova">Proença-a-Nova</option>
-                        <option value="OUTRO">Outro (Escrever manual)</option>
+                        <option value="OUTRO">Outro (Manual)</option>
                     </select>
                     <input type="text" id="in_lugar_manual" placeholder="Escreva o lugar..." style="margin-top: 5px; display: none;">
                 </div>
@@ -674,10 +622,10 @@
                 <div class="form-group">
                     <label>Tipo de Letra:</label>
                     <select id="select_fonte" onchange="mudarEstilofonte(this.value)">
-                        <option value="fonte-caveat">Caveat (Manuscrita Fluida)</option>
-                        <option value="fonte-kalam">Kalam (Manuscrita Limpa)</option>
-                        <option value="fonte-indie">Indie Flower (Bloco Rápido)</option>
-                        <option value="fonte-patrick" selected>Patrick Hand (Tinta Permanente)</option>
+                        <option value="fonte-caveat">Caveat (Fluida)</option>
+                        <option value="fonte-kalam">Kalam (Limpa)</option>
+                        <option value="fonte-indie">Indie Flower (Bloco)</option>
+                        <option value="fonte-patrick" selected>Patrick Hand (Tinta)</option>
                         <option value="fonte-padrao">Normal (Impressora)</option>
                     </select>
                 </div>
@@ -688,75 +636,93 @@
             <div class="actions">
                 <button type="button" class="btn btn-verde-suave" onclick="apagarUltimaLinha()">Apagar</button>
                 <button type="button" class="btn btn-verde-suave" onclick="voltarInsercao()">Voltar</button>
-                <button type="button" class="btn btn-violeta-suave" onclick="gravarDados()" style="margin-left: auto;">Gravar</button>
+                <button type="button" class="btn btn-violeta-suave" onclick="gravarDados()" style="margin-left: auto;">Sincronizado</button>
                 <button type="button" class="btn btn-violeta-suave" onclick="imprimirFolha()">Imprimir</button>
                 <button type="button" class="btn btn-violeta-suave" onclick="limparFolha()">Limpar</button>
             </div>
         </form>
     </div>
 
-    <div class="page">
-        <div class="master-box">
-            <div class="header-top">
-                <div>
-                    <div class="mod-tag">Mod.06/20</div>
-                    <div class="year-title">
-                        <span>Ano</span>
-                        <input type="text" id="txt_mes_atual" class="maiusculas" placeholder="JAN/26" maxlength="7" oninput="this.value = this.value.toUpperCase(); gravarDadosAutomatico();">
+    <!-- Visualização da Folha -->
+    <div class="page-container">
+        <div class="page">
+            <div class="master-box">
+                <div class="header-top">
+                    <div>
+                        <div class="mod-tag">Mod.06/20</div>
+                        <div class="year-title">
+                            <span>Ano</span>
+                            <input type="text" id="txt_mes_atual" class="maiusculas" placeholder="JAN/26" maxlength="7" oninput="this.value = this.value.toUpperCase(); gravarDadosAutomatico();">
+                        </div>
+                    </div>
+
+                    <div class="header-logo-container">
+                        <img src="tec_sem _fundo.png" alt="T.E.C., LDA">
+                    </div>
+
+                    <div class="header-box-group">
+                        <div class="header-field">
+                            <label>Assinatura Responsável Do Camião:</label>
+                            <input type="text" id="txt_assinatura" class="maiusculas" style="width: 170px;" placeholder="EX: NOME" oninput="validarApenasLetras(this); gravarDadosAutomatico()">
+                        </div>
+                        <div class="header-field">
+                            <label>Matrícula:</label>
+                            <input type="text" id="txt_matricula" class="maiusculas" style="width: 80px;" maxlength="8" placeholder="00-00-00" oninput="aplicarMascaraMatricula(this); gravarDadosAutomatico()">
+                        </div>
+                        <div class="header-field" style="display: none;">
+                            <label>Média Geral:</label>
+                            <input type="text" id="head_media" style="width: 70px;" readonly>
+                        </div>
+                        <div class="header-field">
+                            <label>Últimos Kms:</label>
+                            <input type="number" id="head_ultimos_kms" placeholder="000000" style="width: 90px;" oninput="validarNumeroPositivo(this); atualizarUltimosKmsAutomatico();">
+                        </div>
                     </div>
                 </div>
 
-                <div class="header-logo-container">
-                    <img src="tec_sem _fundo.png" alt="T.E.C., LDA - Transportes Eduardo Cardoso, Lda.">
-                </div>
-
-                <div class="header-box-group">
-                    <div class="header-field">
-                        <label>Assinatura Responsável Do Camião:</label>
-                        <input type="text" id="txt_assinatura" class="maiusculas" style="width: 170px;" placeholder="EX: NOME" oninput="validarApenasLetras(this); gravarDadosAutomatico()">
-                    </div>
-                    <div class="header-field">
-                        <label>Matrícula:</label>
-                        <input type="text" id="txt_matricula" class="maiusculas" style="width: 80px;" maxlength="8" placeholder="00-00-00" oninput="aplicarMascaraMatricula(this); gravarDadosAutomatico()">
-                    </div>
-                    <div class="header-field" style="display: none;">
-                        <label>Média Geral:</label>
-                        <input type="text" id="head_media" style="width: 70px;" readonly>
-                    </div>
-                    <div class="header-field">
-                        <label>Últimos Kms:</label>
-                        <input type="number" id="head_ultimos_kms" placeholder="000000" style="width: 90px;" oninput="validarNumeroPositivo(this); atualizarUltimosKmsAutomatico();">
-                    </div>
-                </div>
+                <table class="main-table" id="tabelaOriginal">
+                    <thead>
+                        <tr>
+                            <th style="width: 7%;">Data:</th>
+                            <th style="width: 12%;">Lugar:</th>
+                            <th style="width: 18%;">Posto de gasolina:</th>
+                            <th style="width: 10%;">Cartão:</th>
+                            <th style="width: 8%;">Adblue</th>
+                            <th style="width: 9%;">Gasóleo</th>
+                            <th style="width: 8%;">Preço € :</th>
+                            <th style="width: 9%;">Total €:</th>
+                            <th style="width: 10%;">KMS :</th>
+                            <th style="width: 7%;">Média:</th>
+                            <th>Observações:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
-
-            <table class="main-table" id="tabelaOriginal">
-                <thead>
-                    <tr>
-                        <th style="width: 7%;">Data:</th>
-                        <th style="width: 12%;">Lugar:</th>
-                        <th style="width: 18%;">Posto de gasolina:</th>
-                        <th style="width: 10%;">Cartão:</th>
-                        <th style="width: 8%;">Adblue</th>
-                        <th style="width: 9%;">Gasóleo</th>
-                        <th style="width: 8%;">Preço € :</th>
-                        <th style="width: 9%;">Total €:</th>
-                        <th style="width: 10%;">KMS :</th>
-                        <th style="width: 7%;">Média:</th>
-                        <th>Observações:</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
         </div>
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_MESSAGING_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const dbRef = db.ref('registo_gasoleo/dados_atuais');
+
         const TOTAL_LINHAS = 28;
         let dadosPreenchidos = [];
         let pilhaHistoricoRemocoes = [];
         let adbluePendenteFluxo = 0;
+        let atualizandoRemotamente = false;
 
         function definirDataAtual() {
             const hoje = new Date();
@@ -769,9 +735,7 @@
         function obterMesAnoAtualFormatado() {
             const mesesAbreviados = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
             const hoje = new Date();
-            const mesStr = mesesAbreviados[hoje.getMonth()];
-            const anoStr = String(hoje.getFullYear()).slice(-2);
-            return `${mesStr}/${anoStr}`;
+            return `${mesesAbreviados[hoje.getMonth()]}/${String(hoje.getFullYear()).slice(-2)}`;
         }
 
         function mudarEstilofonte(classeFonte) {
@@ -780,16 +744,11 @@
         }
 
         function validarNumeroPositivo(input) {
-            if (input.value < 0) {
-                input.value = '';
-            }
+            if (input.value < 0) input.value = '';
         }
 
         function validarGasoleo(input) {
-            if (input.value < 0) {
-                input.value = '';
-                return;
-            }
+            if (input.value < 0) { input.value = ''; return; }
             if (parseFloat(input.value) > 950) {
                 document.getElementById('modalLimiteGasoleo').style.display = 'flex';
                 input.value = 950;
@@ -799,14 +758,10 @@
         function fecharLimiteGasoleo() {
             document.getElementById('modalLimiteGasoleo').style.display = 'none';
             document.getElementById('in_gasoleo').focus();
-            document.getElementById('in_gasoleo').select();
         }
 
         function validarAdblue(input) {
-            if (input.value < 0) {
-                input.value = '';
-                return;
-            }
+            if (input.value < 0) { input.value = ''; return; }
             if (parseFloat(input.value) > 80) {
                 document.getElementById('modalLimiteAdblue').style.display = 'flex';
                 input.value = 80;
@@ -816,37 +771,23 @@
         function fecharLimiteAdblue() {
             document.getElementById('modalLimiteAdblue').style.display = 'none';
             document.getElementById('in_adblue').focus();
-            document.getElementById('in_adblue').select();
         }
 
         function validarApenasLetras(input) {
-            let v = input.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\s-]/g, '');
-            input.value = v;
+            input.value = input.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\s-]/g, '');
         }
 
         function aplicarMascaraMatricula(input) {
             let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             let formatado = "";
-            
-            if (v.length > 0) {
-                formatado += v.substring(0, 2);
-            }
-            if (v.length > 2) {
-                formatado += "-" + v.substring(2, 4);
-            }
-            if (v.length > 4) {
-                formatado += "-" + v.substring(4, 6);
-            }
-            
+            if (v.length > 0) formatado += v.substring(0, 2);
+            if (v.length > 2) formatado += "-" + v.substring(2, 4);
+            if (v.length > 4) formatado += "-" + v.substring(4, 6);
             input.value = formatado;
         }
 
         function atualizarCorSelect(selectObj) {
-            if (selectObj.value === "") {
-                selectObj.style.color = "#94a3b8";
-            } else {
-                selectObj.style.color = "#334155";
-            }
+            selectObj.style.color = selectObj.value === "" ? "#94a3b8" : "#334155";
         }
 
         function tratarSelecaoLugar(selectObj) {
@@ -863,150 +804,91 @@
                 inputManual.focus();
                 inputManual.value = '';
                 inputEstacao.value = '';
-                inputEstacao.readOnly = false;
                 inputCartao.value = 'Nakanoil';
             } else {
                 inputManual.style.display = 'none';
                 inputManual.required = false;
                 inputManual.value = '';
-                inputEstacao.readOnly = false;
-
-                if (valor === 'Badajoz') {
-                    inputEstacao.value = 'Nakanoil';
-                    inputCartao.value = 'Nakanoil';
-                } else if (valor === 'Vila Franca') {
-                    inputEstacao.value = 'Qfuel';
-                    inputCartao.value = 'Nakanoil';
-                } else if (valor === 'Salamanca') {
-                    inputEstacao.value = 'Gasoliva';
-                    inputCartao.value = 'Nakanoil';
-                } else if (valor === 'Castelo Branco' || valor === 'Proença-a-Nova') {
-                    inputEstacao.value = 'José Lourenço';
-                    inputCartao.value = 'José Lourenço';
-                } else {
-                    inputEstacao.value = '';
-                    inputCartao.value = '';
-                }
+                if (valor === 'Badajoz') { inputEstacao.value = 'Nakanoil'; inputCartao.value = 'Nakanoil'; }
+                else if (valor === 'Vila Franca') { inputEstacao.value = 'Qfuel'; inputCartao.value = 'Nakanoil'; }
+                else if (valor === 'Salamanca') { inputEstacao.value = 'Gasoliva'; inputCartao.value = 'Nakanoil'; }
+                else if (valor === 'Castelo Branco' || valor === 'Proença-a-Nova') { inputEstacao.value = 'José Lourenço'; inputCartao.value = 'José Lourenço'; }
+                else { inputEstacao.value = ''; inputCartao.value = ''; }
             }
         }
 
         function verificarMudancaMesAno() {
             const hoje = new Date();
-            const mesAtualNum = hoje.getMonth();
-            const anoAtualNum = hoje.getFullYear();
-            const chaveArmazenada = 'tec_ultimo_mes_registado';
-            
-            const infoSalva = localStorage.getItem(chaveArmazenada);
-            const mesAnoAtualStr = `${mesAtualNum}-${anoAtualNum}`;
-
-            if (!infoSalva) {
-                localStorage.setItem(chaveArmazenada, mesAnoAtualStr);
-            } else if (infoSalva !== mesAnoAtualStr) {
+            const chave = 'tec_ultimo_mes_registado';
+            const atualStr = `${hoje.getMonth()}-${hoje.getFullYear()}`;
+            const salvo = localStorage.getItem(chave);
+            if (!salvo) {
+                localStorage.setItem(chave, atualStr);
+            } else if (salvo !== atualStr) {
                 document.getElementById('modalAlertaMudancaMes').style.display = 'flex';
-                localStorage.setItem(chaveArmazenada, mesAnoAtualStr);
+                localStorage.setItem(chave, atualStr);
             }
-
-            verificarImpressaoUltimoDiaMes(hoje);
         }
 
         function fecharAlertaMudancaMes() {
             document.getElementById('modalAlertaMudancaMes').style.display = 'none';
         }
 
-        function verificarImpressaoUltimoDiaMes(hoje) {
-            const ano = hoje.getFullYear();
-            const mes = hoje.getMonth();
-            const dia = hoje.getDate();
-            const ultimoDia = new Date(ano, mes + 1, 0).getDate();
-
-            if (dia === ultimoDia) {
-                const chaveImpressaoDia = `tec_impresso_${ano}_${mes + 1}_${dia}`;
-                if (!localStorage.getItem(chaveImpressaoDia)) {
-                    localStorage.setItem(chaveImpressaoDia, 'true');
-                    setTimeout(() => {
-                        window.print();
-                    }, 1500);
-                }
-            }
-        }
-
-        function carregarEstadoSalvo() {
-            const salvo = localStorage.getItem('tec_dados_viagem');
-            if (salvo) {
-                try {
-                    const obj = JSON.parse(salvo);
+        function inicializarOuvinteFirebase() {
+            dbRef.on('value', (snapshot) => {
+                const obj = snapshot.val();
+                if (obj) {
+                    atualizandoRemotamente = true;
                     dadosPreenchidos = obj.tabela || [];
                     document.getElementById('txt_assinatura').value = (obj.assinatura || '').toUpperCase();
                     document.getElementById('txt_matricula').value = (obj.matricula || '').toUpperCase();
                     document.getElementById('head_ultimos_kms').value = obj.ultimosKms || '';
-                    
-                    const campoMes = document.getElementById('txt_mes_atual');
-                    campoMes.value = obj.mesAtual ? obj.mesAtual.toUpperCase() : obterMesAnoAtualFormatado();
+                    document.getElementById('txt_mes_atual').value = obj.mesAtual ? obj.mesAtual.toUpperCase() : obterMesAnoAtualFormatado();
 
                     if (obj.fonteSelecionada) {
                         document.body.className = obj.fonteSelecionada;
                         document.getElementById('select_fonte').value = obj.fonteSelecionada;
-                    } else {
-                        document.body.className = 'fonte-patrick';
-                        document.getElementById('select_fonte').value = 'fonte-patrick';
                     }
-                } catch(e) {
+
+                    while(dadosPreenchidos.length < TOTAL_LINHAS) dadosPreenchidos.push(["","","","","","","","","","",""]);
+                    renderizarTabela();
+                    recalcularUltimosKmsCabecalho();
+                    setTimeout(() => { atualizandoRemotamente = false; }, 200);
+                } else {
                     inicializarVazio();
                     document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
                     document.body.className = 'fonte-patrick';
                     document.getElementById('select_fonte').value = 'fonte-patrick';
+                    renderizarTabela();
                 }
-            } else {
-                inicializarVazio();
-                document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
-                document.body.className = 'fonte-patrick';
-                document.getElementById('select_fonte').value = 'fonte-patrick';
-            }
-            while(dadosPreenchidos.length < TOTAL_LINHAS) {
-                dadosPreenchidos.push(["","","","","","","","","","",""]);
-            }
-            recalcularUltimosKmsCabecalho();
+            });
         }
 
         function inicializarVazio() {
             dadosPreenchidos = [];
-            for(let i=0; i<TOTAL_LINHAS; i++) {
-                dadosPreenchidos.push(["","","","","","","","","","",""]);
-            }
+            for(let i=0; i<TOTAL_LINHAS; i++) dadosPreenchidos.push(["","","","","","","","","","",""]);
         }
 
-        carregarEstadoSalvo();
         definirDataAtual();
         verificarMudancaMesAno();
-        
-        const selectLugarEl = document.getElementById('in_lugar_select');
-        atualizarCorSelect(selectLugarEl);
+        inicializarOuvinteFirebase();
+        atualizarCorSelect(document.getElementById('in_lugar_select'));
 
         const tbody = document.querySelector('#tabelaOriginal tbody');
-        
+
         function renderizarTabela() {
             tbody.innerHTML = '';
             for (let i = 0; i < TOTAL_LINHAS; i++) {
                 const tr = document.createElement('tr');
                 const rowData = dadosPreenchidos[i] || ["","","","","","","","","","",""];
                 tr.innerHTML = `
-                    <td>${rowData[0]}</td>
-                    <td>${rowData[1]}</td>
-                    <td>${rowData[2]}</td>
-                    <td>${rowData[3]}</td>
-                    <td>${rowData[4]}</td>
-                    <td>${rowData[5]}</td>
-                    <td>${rowData[6]}</td>
-                    <td>${rowData[7]}</td>
-                    <td>${rowData[8]}</td>
-                    <td></td>
-                    <td>${rowData[10]}</td>
+                    <td>${rowData[0]}</td><td>${rowData[1]}</td><td>${rowData[2]}</td><td>${rowData[3]}</td>
+                    <td>${rowData[4]}</td><td>${rowData[5]}</td><td>${rowData[6]}</td><td>${rowData[7]}</td>
+                    <td>${rowData[8]}</td><td></td><td>${rowData[10]}</td>
                 `;
                 tbody.appendChild(tr);
             }
         }
-        
-        renderizarTabela();
 
         function recalcularUltimosKmsCabecalho() {
             let ultimoKmValido = "";
@@ -1016,72 +898,50 @@
                     break;
                 }
             }
-            
-            if(ultimoKmValido !== "") {
-                document.getElementById('head_ultimos_kms').value = ultimoKmValido;
-            }
+            if(ultimoKmValido !== "") document.getElementById('head_ultimos_kms').value = ultimoKmValido;
         }
 
-        function atualizarUltimosKmsAutomatico() {
-            gravarDadosAutomatico();
-        }
+        function atualizarUltimosKmsAutomatico() { gravarDadosAutomatico(); }
 
         function obterUltimosKmsReferencia(linhaIdx) {
             let kmsBase = parseFloat(document.getElementById('head_ultimos_kms').value) || 0;
             for(let k = 0; k < linhaIdx; k++) {
-                if(dadosPreenchidos[k][8] !== "") {
-                    kmsBase = parseFloat(dadosPreenchidos[k][8]);
-                }
+                if(dadosPreenchidos[k][8] !== "") kmsBase = parseFloat(dadosPreenchidos[k][8]);
             }
             return kmsBase;
         }
 
         function registarViagem() {
             const gasoleoVal = document.getElementById('in_gasoleo').value.trim();
-            const gasoleoNum = parseFloat(gasoleoVal);
-
-            if (gasoleoVal === "" || isNaN(gasoleoNum) || gasoleoNum <= 0) {
-                alert("Atenção: O campo 'Gasóleo' é obrigatório e tem de conter uma quantidade válida de litros para inserir a linha!");
+            if (gasoleoVal === "" || parseFloat(gasoleoVal) <= 0) {
+                alert("O campo 'Gasóleo' é obrigatório!");
                 document.getElementById('in_gasoleo').focus();
                 return;
             }
 
             const selectLugar = document.getElementById('in_lugar_select').value;
-            const inputManual = document.getElementById('in_lugar_manual');
-            if (selectLugar === 'OUTRO' && inputManual.value.trim() === "") {
-                alert("Atenção: O campo 'Lugar' é de preenchimento obrigatório quando seleciona 'Outro'!");
-                inputManual.focus();
+            if (selectLugar === 'OUTRO' && document.getElementById('in_lugar_manual').value.trim() === "") {
+                alert("Indique o lugar manual!");
+                document.getElementById('in_lugar_manual').focus();
                 return;
             }
 
             let linhaIdx = -1;
             for(let i=0; i<TOTAL_LINHAS; i++) {
-                if(!dadosPreenchidos[i][0] && !dadosPreenchidos[i][1] && !dadosPreenchidos[i][8]) {
-                    linhaIdx = i;
-                    break;
-                }
+                if(!dadosPreenchidos[i][0] && !dadosPreenchidos[i][1] && !dadosPreenchidos[i][8]) { linhaIdx = i; break; }
             }
 
-            if (linhaIdx === -1) {
-                alert("A folha já está completamente preenchida!");
-                return;
-            }
+            if (linhaIdx === -1) { alert("A folha está cheia!"); return; }
 
             const kmsAtual = parseFloat(document.getElementById('in_kms').value);
-            if (isNaN(kmsAtual)) {
-                alert("Por favor, insira um valor válido para os KMS.");
-                document.getElementById('in_kms').focus();
-                return;
-            }
+            if (isNaN(kmsAtual)) { alert("Insira os KMS."); document.getElementById('in_kms').focus(); return; }
 
             let kmsAnteriores = obterUltimosKmsReferencia(linhaIdx);
-            
             if (kmsAtual < kmsAnteriores) {
                 document.getElementById('textoErroKms').innerText = "KMS inferiores aos atuais!!";
                 document.getElementById('modalErroKms').style.display = 'flex';
                 return;
             }
-
             if (kmsAtual === kmsAnteriores) {
                 document.getElementById('textoErroKms').innerText = "Não autorizado a colocar os mesmos kms !!!!";
                 document.getElementById('modalErroKms').style.display = 'flex';
@@ -1094,293 +954,139 @@
             if (adblueVal === "" || adblueNum === 0) {
                 adbluePendenteFluxo = 0;
                 document.getElementById('modalAdblue').style.display = 'flex';
-                return; 
+                return;
             }
 
             adbluePendenteFluxo = adblueNum;
             verificarDadosCabecalhoEInserir();
         }
 
-        function fecharErroKms() {
-            document.getElementById('modalErroKms').style.display = 'none';
-            document.getElementById('in_kms').focus();
-            document.getElementById('in_kms').select();
-        }
-
-        function respostaAdblue(escolheuSim) {
+        function fecharErroKms() { document.getElementById('modalErroKms').style.display = 'none'; document.getElementById('in_kms').focus(); }
+        function respostaAdblue(sim) {
             document.getElementById('modalAdblue').style.display = 'none';
-
-            if (escolheuSim) {
-                document.getElementById('modalAvisoAdblue').style.display = 'flex';
-            } else {
-                adbluePendenteFluxo = 0;
-                verificarDadosCabecalhoEInserir();
-            }
+            if (sim) document.getElementById('modalAvisoAdblue').style.display = 'flex';
+            else { adbluePendenteFluxo = 0; verificarDadosCabecalhoEInserir(); }
         }
-
-        function fecharAvisoAdblue() {
-            document.getElementById('modalAvisoAdblue').style.display = 'none';
-            document.getElementById('in_adblue').focus();
-        }
+        function fecharAvisoAdblue() { document.getElementById('modalAvisoAdblue').style.display = 'none'; document.getElementById('in_adblue').focus(); }
 
         function verificarDadosCabecalhoEInserir() {
-            const matriculaVal = document.getElementById('txt_matricula').value.trim();
-            const assinaturaVal = document.getElementById('txt_assinatura').value.trim();
-
-            if (!matriculaVal) {
-                document.getElementById('inputModalMatricula').value = '';
+            if (!document.getElementById('txt_matricula').value.trim()) {
                 document.getElementById('modalPedirMatricula').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('inputModalMatricula').focus();
-                }, 100);
+                setTimeout(() => document.getElementById('inputModalMatricula').focus(), 100);
                 return;
             }
-
-            if (!assinaturaVal) {
-                document.getElementById('inputModalAssinatura').value = '';
+            if (!document.getElementById('txt_assinatura').value.trim()) {
                 document.getElementById('modalPedirAssinatura').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('inputModalAssinatura').focus();
-                }, 100);
+                setTimeout(() => document.getElementById('inputModalAssinatura').focus(), 100);
                 return;
             }
-
             executarInsercaoFinal(adbluePendenteFluxo);
         }
 
         function confirmarModalMatricula() {
             const val = document.getElementById('inputModalMatricula').value.trim();
-            if (!val) {
-                document.getElementById('inputModalMatricula').focus();
-                return;
-            }
+            if (!val) return;
             document.getElementById('txt_matricula').value = val.toUpperCase();
             document.getElementById('modalPedirMatricula').style.display = 'none';
             gravarDadosAutomatico();
-            
-            // Prosseguir para verificar assinatura ou inserir
             verificarDadosCabecalhoEInserir();
         }
 
         function confirmarModalAssinatura() {
             const val = document.getElementById('inputModalAssinatura').value.trim();
-            if (!val) {
-                document.getElementById('inputModalAssinatura').focus();
-                return;
-            }
+            if (!val) return;
             document.getElementById('txt_assinatura').value = val.toUpperCase();
             document.getElementById('modalPedirAssinatura').style.display = 'none';
             gravarDadosAutomatico();
-            
-            // Inserir viagem final
             executarInsercaoFinal(adbluePendenteFluxo);
         }
 
         function executarInsercaoFinal(adblueNum) {
             let linhaIdx = -1;
             for(let i=0; i<TOTAL_LINHAS; i++) {
-                if(!dadosPreenchidos[i][0] && !dadosPreenchidos[i][1] && !dadosPreenchidos[i][8]) {
-                    linhaIdx = i;
-                    break;
-                }
+                if(!dadosPreenchidos[i][0] && !dadosPreenchidos[i][1] && !dadosPreenchidos[i][8]) { linhaIdx = i; break; }
             }
 
             const dataVal = document.getElementById('in_data').value;
             const selectLugar = document.getElementById('in_lugar_select').value;
-            let lugar = selectLugar;
-            if (selectLugar === 'OUTRO') {
-                lugar = document.getElementById('in_lugar_manual').value;
-            }
-
-            const estacao = document.getElementById('in_estacao').value;
-            const cartao = document.getElementById('in_cartao').value;
-            const kmsAtual = parseFloat(document.getElementById('in_kms').value);
-
-            let dataFormatada = "";
-            if (dataVal) {
-                const partes = dataVal.split('-');
-                if (partes.length === 3) {
-                    dataFormatada = partes[2] + '/' + partes[1];
-                }
-            }
-
-            const gasoleoNum = parseFloat(document.getElementById('in_gasoleo').value);
+            let lugar = selectLugar === 'OUTRO' ? document.getElementById('in_lugar_manual').value : selectLugar;
+            let dataFormatada = dataVal ? dataVal.split('-').reverse().slice(0, 2).join('/') : "";
 
             dadosPreenchidos[linhaIdx] = [
-                dataFormatada,
-                lugar.toUpperCase(),
-                estacao.toUpperCase(),
-                cartao.toUpperCase(),
-                adblueNum > 0 ? adblueNum : "",
-                gasoleoNum,
-                "", 
-                "", 
-                kmsAtual,
-                "",
-                ""  
+                dataFormatada, lugar.toUpperCase(), document.getElementById('in_estacao').value.toUpperCase(),
+                document.getElementById('in_cartao').value.toUpperCase(), adblueNum > 0 ? adblueNum : "",
+                parseFloat(document.getElementById('in_gasoleo').value), "", "", parseFloat(document.getElementById('in_kms').value), "", ""
             ];
 
             pilhaHistoricoRemocoes = [];
-
             renderizarTabela();
             recalcularUltimosKmsCabecalho();
             gravarDadosAutomatico();
 
-            const selectEl = document.getElementById('in_lugar_select');
-            selectEl.value = '';
-            atualizarCorSelect(selectEl);
+            document.getElementById('in_lugar_select').value = '';
+            atualizarCorSelect(document.getElementById('in_lugar_select'));
             document.getElementById('in_lugar_manual').style.display = 'none';
-            document.getElementById('in_lugar_manual').value = '';
             document.getElementById('in_estacao').value = '';
             document.getElementById('in_cartao').value = '';
             document.getElementById('in_gasoleo').value = '';
             document.getElementById('in_adblue').value = '';
             document.getElementById('in_kms').value = '';
             definirDataAtual();
-            selectEl.focus();
+            document.getElementById('in_lugar_select').focus();
         }
 
         function apagarUltimaLinha() {
-            let ultimaPreenchidaIdx = -1;
+            let ultima = -1;
             for(let i = TOTAL_LINHAS - 1; i >= 0; i--) {
-                if(dadosPreenchidos[i][0] || dadosPreenchidos[i][1] || dadosPreenchidos[i][8]) {
-                    ultimaPreenchidaIdx = i;
-                    break;
-                }
+                if(dadosPreenchidos[i][0] || dadosPreenchidos[i][1] || dadosPreenchidos[i][8]) { ultima = i; break; }
             }
-
-            if(ultimaPreenchidaIdx === -1) {
-                alert("Não existem linhas preenchidas para apagar.");
-                return;
-            }
-
-            pilhaHistoricoRemocoes.push({
-                indice: ultimaPreenchidaIdx,
-                dados: [...dadosPreenchidos[ultimaPreenchidaIdx]]
-            });
-
-            dadosPreenchidos[ultimaPreenchidaIdx] = ["","","","","","","","","","",""];
+            if (ultima === -1) { alert("Sem linhas para apagar."); return; }
+            pilhaHistoricoRemocoes.push({ indice: ultima, dados: [...dadosPreenchidos[ultima]] });
+            dadosPreenchidos[ultima] = ["","","","","","","","","","",""];
             renderizarTabela();
             recalcularUltimosKmsCabecalho();
             gravarDadosAutomatico();
         }
 
         function voltarInsercao() {
-            if(pilhaHistoricoRemocoes.length === 0) {
-                document.getElementById('modalSemHistorico').style.display = 'flex';
-                return;
-            }
-
-            const ultimaApagada = pilhaHistoricoRemocoes.pop();
-
-            dadosPreenchidos[ultimaApagada.indice] = [...ultimaApagada.dados];
+            if (pilhaHistoricoRemocoes.length === 0) { document.getElementById('modalSemHistorico').style.display = 'flex'; return; }
+            const ultima = pilhaHistoricoRemocoes.pop();
+            dadosPreenchidos[ultima.indice] = [...ultima.dados];
             renderizarTabela();
             recalcularUltimosKmsCabecalho();
             gravarDadosAutomatico();
         }
 
-        function fecharSemHistorico() {
-            document.getElementById('modalSemHistorico').style.display = 'none';
-        }
-
-        function gravarDados() {
-            const payload = {
-                tabela: dadosPreenchidos,
-                assinatura: document.getElementById('txt_assinatura').value,
-                matricula: document.getElementById('txt_matricula').value,
-                ultimosKms: document.getElementById('head_ultimos_kms').value,
-                mesAtual: document.getElementById('txt_mes_atual').value,
-                fonteSelecionada: document.body.className
-            };
-            localStorage.setItem('tec_dados_viagem', JSON.stringify(payload));
-            pilhaHistoricoRemocoes = [];
-            alert("Dados gravados com sucesso!");
-        }
-
+        function fecharSemHistorico() { document.getElementById('modalSemHistorico').style.display = 'none'; }
+        function gravarDados() { gravarDadosAutomatico(); pilhaHistoricoRemocoes = []; alert("Dados sincronizados!"); }
         function gravarDadosAutomatico() {
-            const payload = {
+            if (atualizandoRemotamente) return;
+            dbRef.set({
                 tabela: dadosPreenchidos,
                 assinatura: document.getElementById('txt_assinatura').value,
                 matricula: document.getElementById('txt_matricula').value,
                 ultimosKms: document.getElementById('head_ultimos_kms').value,
                 mesAtual: document.getElementById('txt_mes_atual').value,
                 fonteSelecionada: document.body.className
-            };
-            localStorage.setItem('tec_dados_viagem', JSON.stringify(payload));
+            });
         }
-
-        function imprimirFolha() {
-            window.print();
-        }
-
-        function limparFolha() {
-            document.getElementById('modalLimpar').style.display = 'flex';
-        }
-
-        function respostaLimpar(escolheuSim) {
+        function imprimirFolha() { window.print(); }
+        function limparFolha() { document.getElementById('modalLimpar').style.display = 'flex'; }
+        function respostaLimpar(sim) {
             document.getElementById('modalLimpar').style.display = 'none';
-
-            if (escolheuSim) {
-                localStorage.removeItem('tec_dados_viagem');
+            if (sim) {
                 inicializarVazio();
                 pilhaHistoricoRemocoes = [];
                 renderizarTabela();
-                
                 document.getElementById('head_ultimos_kms').value = '';
                 document.getElementById('txt_assinatura').value = '';
                 document.getElementById('txt_matricula').value = '';
                 document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
-                
                 document.body.className = 'fonte-patrick';
                 document.getElementById('select_fonte').value = 'fonte-patrick';
-
-                const selectEl = document.getElementById('in_lugar_select');
-                selectEl.value = '';
-                atualizarCorSelect(selectEl);
-                document.getElementById('in_lugar_manual').style.display = 'none';
-                document.getElementById('in_lugar_manual').value = '';
-                document.getElementById('in_estacao').value = '';
-                document.getElementById('in_cartao').value = '';
-                document.getElementById('in_kms').value = '';
-                document.getElementById('in_gasoleo').value = '';
-                document.getElementById('in_adblue').value = '';
-                
-                definirDataAtual();
+                gravarDadosAutomatico();
             }
         }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                if (document.getElementById('modalErroKms').style.display === 'flex') {
-                    event.preventDefault();
-                    fecharErroKms();
-                } else if (document.getElementById('modalLimiteAdblue').style.display === 'flex') {
-                    event.preventDefault();
-                    fecharLimiteAdblue();
-                } else if (document.getElementById('modalLimiteGasoleo').style.display === 'flex') {
-                    event.preventDefault();
-                    fecharLimiteGasoleo();
-                } else if (document.getElementById('modalSemHistorico').style.display === 'flex') {
-                    event.preventDefault();
-                    fecharSemHistorico();
-                } else if (document.getElementById('modalAdblue').style.display === 'flex') {
-                    event.preventDefault();
-                    respostaAdblue(false);
-                } else if (document.getElementById('modalAvisoAdblue').style.display === 'flex') {
-                    event.preventDefault();
-                    fecharAvisoAdblue();
-                } else if (document.getElementById('modalAlertaMudancaMes').style.display === 'flex') {
-                    event.preventDefault();
-                    fecharAlertaMudancaMes();
-                } else if (document.getElementById('modalPedirMatricula').style.display === 'flex') {
-                    event.preventDefault();
-                    confirmarModalMatricula();
-                } else if (document.getElementById('modalPedirAssinatura').style.display === 'flex') {
-                    event.preventDefault();
-                    confirmarModalAssinatura();
-                }
-            }
-        });
     </script>
 </body>
 </html>
