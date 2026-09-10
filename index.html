@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mod. 06/20 - T.E.C., LDA</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Favicon.png">
+
+    <!-- Importação das fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Indie+Flower&family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        body {
+            background-color: #f1f3f6;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .maiusculas {
+            text-transform: uppercase;
+        }
+
+        /* Tipografia e Cor Azul Caneta da Folha A4 (+2px em cada) */
+        body.fonte-padrao .main-table td { font-family: Arial, Helvetica, sans-serif !important; font-size: 12px !important; color: #1d4ed8 !important; }
+        body.fonte-caveat .main-table td { font-family: 'Caveat', cursive !important; font-size: 15.5px !important; color: #1d4ed8 !important; }
+        body.fonte-kalam .main-table td { font-family: 'Kalam', cursive !important; font-size: 13.5px !important; color: #1d4ed8 !important; }
+        body.fonte-indie .main-table td { font-family: 'Indie Flower', cursive !important; font-size: 14px !important; color: #1d4ed8 !important; }
+        body.fonte-patrick .main-table td { font-family: 'Patrick Hand', cursive !important; font-size: 14px !important; letter-spacing: 0.8px !important; color: #1d4ed8 !important; }
+
+        /* PAINEL DE FORMULÁRIO (Página de Entrada) */
+        .interactive-panel {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+        }
+
+        .interactive-panel h3 {
+            margin-top: 0;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            background-color: #f8fafc;
+            height: 44px;
+            color: #1e293b;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .campo-curto input {
+            text-align: center;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #0284c7;
+            background-color: #fff;
+        }
+
+        .actions {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 42px;
+            width: 100%;
+        }
+
+        .btn-inserir {
+            background-color: #166534;
+            color: #ffffff;
+            font-size: 15px;
+            grid-column: span 2;
+        }
+
+        .btn-toggle-a4 {
+            background-color: #0284c7;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* MODAIS */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .modal-box p { font-size: 14px; font-weight: bold; color: #334155; margin-top: 0; margin-bottom: 15px; }
+        .modal-box input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; margin-bottom: 20px; outline: none; text-align: center; color: #334155; background-color: #f8fafc; }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+        .modal-btn { padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; font-size: 14px; }
+        .modal-btn-sim, .modal-btn-ok { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; width: 100%; }
+        .modal-btn-nao { background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca; width: 100%; }
+
+        /* AVISO TEMPORIZADOR */
+        #avisoTemporizador {
+            display: none;
+            background-color: #0284c7;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* CONTROLO DE PÁGINA DISTINTA PARA A FOLHA A4 */
+        .page-container {
+            display: none;
+            width: 100%;
+            max-width: 297mm;
+            overflow-x: auto;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body.ver-folha-ativa .interactive-panel {
+            display: none !important;
+        }
+
+        body.ver-folha-ativa .page-container {
+            display: flex !important;
+        }
+
+        /* ESTRUTURA DA FOLHA A4 */
+        .page {
+            background: white;
+            width: 297mm;
+            height: 210mm;
+            padding: 4mm 8mm 6mm 8mm;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            border: 1px solid #cbd5e1;
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* BARRA SUPERIOR DE AÇÕES NA FOLHA A4 */
+        .a4-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 3px;
+            gap: 12px;
+            position: relative;
+        }
+
+        .a4-buttons-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .btn-a4 {
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 24px;
+            min-width: 32px;
+            padding: 0 12px;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.15s ease;
+            box-sizing: border-box;
+        }
+
+        .btn-a4-apagar {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-a4-verde {
+            background-color: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .btn-a4:hover {
+            filter: brightness(0.96);
+        }
+
+        .btn-sair-a4 {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0 8px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            line-height: 1;
+            height: 24px;
+            flex-shrink: 0;
+            position: absolute;
+            right: 0;
+            box-sizing: border-box;
+        }
+
+        .btn-sair-a4:hover {
+            background-color: #dc2626;
+        }
+
+        .master-box {
+            border: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            padding: 4px;
+            background-color: #fff;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+            gap: 10px;
+        }
+
+        .mod-tag { font-size: 10px; font-weight: bold; color: #475569; }
+        .year-title { font-size: 16px; font-weight: bold; margin-top: 1px; display: flex; align-items: center; gap: 6px; color: #334155; }
+
+        #txt_mes_atual {
+            border: 1px dashed #94a3b8;
+            background: #f8fafc;
+            font-size: 14px;
+            font-weight: bold;
+            width: 90px;
+            text-align: center;
+            padding: 1px 3px;
+            border-radius: 3px;
+            outline: none;
+            color: #1d4ed8;
+            position: relative;
+            left: 5mm;
+            top: -3.5px;
+        }
+
+        .header-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            margin: 0 12px;
+        }
+
+        .header-logo-container img {
+            height: 44px;
+            width: 100%;
+            max-width: 180px;
+            object-fit: contain;
+            opacity: 0.75;
+        }
+
+        .header-box-group {
+            display: flex;
+            border: 2px solid #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #f8fafc;
+            flex-wrap: wrap;
+        }
+
+        .header-field {
+            padding: 3px 8px;
+            border-right: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .header-field:last-child { border-right: none; }
+        .header-field label { font-size: 10.5px; font-weight: bold; white-space: nowrap; color: #334155; }
+        .header-field input { border: none; background: transparent; font-weight: bold; font-size: 11px; outline: none; text-align: center; color: #1d4ed8; }
+
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2px;
+            flex-grow: 1;
+            table-layout: fixed;
+            empty-cells: show;
+        }
+
+        .main-table tr {
+            height: 25px;
+        }
+
+        .main-table th, .main-table td {
+            border: 1px solid #334155 !important;
+            padding: 1px 3px;
+            text-align: center;
+            overflow: hidden;
+            height: 25px;
+        }
+
+        .main-table th { background-color: #f1f5f9; font-weight: bold; color: #334155; font-size: 10px; }
+        .main-table td { vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; color: #1d4ed8; }
+
+        /* REGRAS DE IMPRESSÃO */
+        @page { size: A4 landscape; margin: 0; }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            html, body {
+                width: 297mm; height: 210mm; background: white; margin: 0 !important; padding: 0 !important;
+            }
+            .interactive-panel, .modal-overlay, #avisoTemporizador, .a4-top-bar {
+                display: none !important;
+            }
+            .page-container {
+                display: flex !important; width: 297mm !important; height: 210mm !important; overflow: visible !important;
+            }
+            .page {
+                box-shadow: none !important; border: none !important; width: 297mm !important; height: 210mm !important; margin: 0 !important; padding-top: 6mm !important;
+            }
+            #txt_mes_atual { border: none !important; background: transparent !important; }
+            
+            .main-table th, .main-table td {
+                border: 1px solid #000000 !important; 
+            }
+        }
+    </style>
+</head>
+<body class="fonte-patrick">
+
+    <!-- MODAL DE CAMPO OBRIGATÓRIO EM FALTA -->
+    <div id="modalCampoFalta" class="modal-overlay">
+        <div class="modal-box">
+            <p id="textoCampoFalta">Preencha o campo em falta.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharModalCampoFalta()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Operação -->
+    <div id="modalAdblue" class="modal-overlay">
+        <div class="modal-box">
+            <p>Meteu Adblue?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-sim" onclick="respostaAdblue(true)">Sim</button>
+                <button class="modal-btn modal-btn-nao" onclick="respostaAdblue(false)">Não</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAvisoAdblue" class="modal-overlay">
+        <div class="modal-box">
+            <p>Lembre-se de inserir os litros de Adblue.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharAvisoAdblue()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalLimiteAdblue" class="modal-overlay">
+        <div class="modal-box">
+            <p>Atenção: O limite máximo para o Adblue é de 80 litros!</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharLimiteAdblueModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalLimiteGasoleo" class="modal-overlay">
+        <div class="modal-box">
+            <p>Atenção: O limite máximo do depósito de gasóleo é de 950 litros!</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharLimiteGasoleo()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalErroKms" class="modal-overlay">
+        <div class="modal-box">
+            <p id="textoErroKms">Erro nos KMS</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharErroKms()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalPedirMatricula" class="modal-overlay">
+        <div class="modal-box">
+            <p>Insira a matrícula do camião:</p>
+            <input type="text" id="inputModalMatricula" class="maiusculas" maxlength="8" placeholder="05-US-04" value="" oninput="aplicarMascaraMatricula(this)">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="confirmarModalMatricula()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalPedirAssinatura" class="modal-overlay">
+        <div class="modal-box">
+            <p>Insira o nome do motorista:</p>
+            <input type="text" id="inputModalAssinatura" class="maiusculas" placeholder="EX: VITOR FERREIRA" value="" oninput="validarApenasLetras(this)">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="confirmarModalAssinatura()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSemLinhas" class="modal-overlay">
+        <div class="modal-box">
+            <p>Não há linhas para apagar.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharSemLinhas()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSemHistorico" class="modal-overlay">
+        <div class="modal-box">
+            <p>Não há nenhuma linha apagada recentemente para repor.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharSemHistorico()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalLimpar" class="modal-overlay">
+        <div class="modal-box">
+            <p>Tem a certeza que deseja limpar toda a folha?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-sim" onclick="respostaLimpar(true)">Sim</button>
+                <button class="modal-btn modal-btn-nao" onclick="respostaLimpar(false)">Não</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAlertaMudancaMes" class="modal-overlay">
+        <div class="modal-box">
+            <p>Atenção: Novo mês/ano detetado! Lembre-se de atualizar o campo respetivo no layout.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-ok" onclick="fecharAlertaMudancaMes()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 1: FORMULÁRIO DE PREENCHIMENTO -->
+    <div class="interactive-panel">
+        <h3>
+            <span>Registo de Gasóleo</span>
+            <span style="font-size: 12px; font-weight: normal; color: #64748b;">Mod. 06/20</span>
+        </h3>
+        <form id="menuForm" novalidate onsubmit="return false;">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Data:</label>
+                    <input type="date" id="in_data">
+                </div>
+                <div class="form-group full-width">
+                    <label>Lugar:</label>
+                    <select id="in_lugar_select" onchange="tratarSelecaoLugar(this); atualizarCorSelect(this);">
+                        <option value="" disabled selected style="color: #94a3b8;">Selecione o lugar...</option>
+                        <option value="Badajoz">Badajoz</option>
+                        <option value="Vila Franca">Vila Franca</option>
+                        <option value="Salamanca">Salamanca</option>
+                        <option value="Castelo Branco">Castelo Branco</option>
+                        <option value="Proença-a-Nova">Proença-a-Nova</option>
+                        <option value="OUTRO">Outro (Manual)</option>
+                    </select>
+                    <input type="text" id="in_lugar_manual" placeholder="Escreva o lugar..." style="margin-top: 6px; display: none;">
+                </div>
+                <div class="form-group full-width">
+                    <label>Posto de gasolina:</label>
+                    <input type="text" id="in_estacao" placeholder="Ex: Galp Pombal">
+                </div>
+                <div class="form-group campo-curto">
+                    <label>Cartão:</label>
+                    <input type="text" id="in_cartao" placeholder="Ex: 1234">
+                </div>
+                <div class="form-group campo-curto">
+                    <label>KMS:</label>
+                    <input type="number" id="in_kms" placeholder="Km atual" oninput="validarNumeroPositivo(this)">
+                </div>
+                <div class="form-group campo-curto">
+                    <label>Gasóleo (L):</label>
+                    <input type="number" step="0.01" id="in_gasoleo" placeholder="0" oninput="validarGasoleo(this)">
+                </div>
+                <div class="form-group campo-curto">
+                    <label>Adblue (L):</label>
+                    <input type="number" step="0.01" id="in_adblue" placeholder="0" oninput="validarAdblue(this)">
+                </div>
+                <div class="form-group full-width">
+                    <label>Tipo de Letra:</label>
+                    <select id="select_fonte" onchange="mudarEstilofonte(this.value)">
+                        <option value="fonte-patrick" selected>Patrick Hand (Tinta)</option>
+                        <option value="fonte-caveat">Caveat (Fluida)</option>
+                        <option value="fonte-kalam">Kalam (Limpa)</option>
+                        <option value="fonte-indie">Indie Flower (Bloco)</option>
+                        <option value="fonte-padrao">Normal (Impressora)</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-inserir" onclick="registarViagem()">INSERIR REGISTO</button>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn btn-toggle-a4" onclick="alternarVerFolha(true)">📄 VER REGISTOS</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- PÁGINA 2: FOLHA A4 DISTINTA -->
+    <div class="page-container">
+        <div id="avisoTemporizador">A voltar ao formulário em <span id="segundosRestantes">5</span>s...</div>
+        
+        <div class="page">
+            <!-- BARRA SUPERIOR DE BOTÕES DA FOLHA A4 -->
+            <div class="a4-top-bar">
+                <div class="a4-buttons-group">
+                    <button type="button" class="btn-a4 btn-a4-apagar" onclick="apagarUltimaLinha()">&lt;</button>
+                    <button type="button" class="btn-a4 btn-a4-verde" onclick="voltarInsercao()">&gt;</button>
+                    <button type="button" id="btn_toggle_limpar" class="btn-a4 btn-a4-apagar" onclick="gerirLimpezaCiclo()">Apagar tudo</button>
+                    <button type="button" class="btn-a4 btn-a4-verde" onclick="gravarDados()">Sincronizado</button>
+                    <button type="button" class="btn-a4 btn-a4-verde" onclick="imprimirFolha()">Imprimir</button>
+                </div>
+                <button class="btn-sair-a4" onclick="alternarVerFolha(false)"><span>[X]</span> SAIR</button>
+            </div>
+
+            <div class="master-box">
+                <div class="header-top">
+                    <div>
+                        <div class="mod-tag">Mod.06/20</div>
+                        <div class="year-title">
+                            <span>Ano</span>
+                            <input type="text" id="txt_mes_atual" class="maiusculas" placeholder="JAN/26" maxlength="7" oninput="this.value = this.value.toUpperCase(); gravarDadosAutomatico();">
+                        </div>
+                    </div>
+
+                    <div class="header-logo-container">
+                        <img src="tec_sem _fundo.png" alt="T.E.C., LDA">
+                    </div>
+
+                    <div class="header-box-group">
+                        <div class="header-field">
+                            <label>Assinatura Responsável Do Camião:</label>
+                            <input type="text" id="txt_assinatura" class="maiusculas" style="width: 170px;" value="" placeholder="" oninput="validarApenasLetras(this); gravarDadosAutomatico()">
+                        </div>
+                        <div class="header-field">
+                            <label>Matrícula:</label>
+                            <input type="text" id="txt_matricula" class="maiusculas" style="width: 80px;" value="" maxlength="8" placeholder="" oninput="aplicarMascaraMatricula(this); gravarDadosAutomatico()">
+                        </div>
+                        <div class="header-field" style="display: none;">
+                            <label>Média Geral:</label>
+                            <input type="text" id="head_media" style="width: 70px;" readonly>
+                        </div>
+                        <div class="header-field">
+                            <label>Últimos Kms:</label>
+                            <input type="number" id="head_ultimos_kms" placeholder="" style="width: 90px;" oninput="validarNumeroPositivo(this); atualizarUltimosKmsAutomatico();">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="main-table" id="tabelaOriginal">
+                    <thead>
+                        <tr>
+                            <th style="width: 6.5%;">Data:</th>
+                            <th style="width: 10.5%;">Lugar:</th>
+                            <th style="width: 14.5%;">Posto de gasolina:</th>
+                            <th style="width: 8.5%;">Cartão:</th>
+                            <th style="width: 7%;">Adblue</th>
+                            <th style="width: 8%;">Gasóleo</th>
+                            <th style="width: 7.5%;">Preço € :</th>
+                            <th style="width: 8.5%;">Total €:</th>
+                            <th style="width: 9.5%;">KMS :</th>
+                            <th style="width: 6.5%;">Média:</th>
+                            <th style="width: 13%;">Observações:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_MESSAGING_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const dbRef = db.ref('registo_gasoleo/dados_atuais');
+
+        const TOTAL_LINHAS = 25;
+        let dadosPreenchidos = [];
+        let pilhaHistoricoRemocoes = [];
+        let estadoBackupAntesLimpeza = null;
+        let folhaApagadaEstado = false;
+        let adbluePendenteFluxo = 0;
+        let atualizandoRemotamente = false;
+        let temporizadorRetorno = null;
+        let elementoFocoAposAlerta = null;
+
+        function definirDataAtual() {
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            document.getElementById('in_data').value = `${ano}-${mes}-${dia}`;
+        }
+
+        function obterMesAnoAtualFormatado() {
+            const mesesAbreviados = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+            const hoje = new Date();
+            return `${mesesAbreviados[hoje.getMonth()]}/${String(hoje.getFullYear()).slice(-2)}`;
+        }
+
+        function mudarEstilofonte(classeFonte) {
+            document.body.className = classeFonte;
+            gravarDadosAutomatico();
+        }
+
+        function alternarVerFolha(mostrar) {
+            if (temporizadorRetorno) {
+                clearInterval(temporizadorRetorno);
+                temporizadorRetorno = null;
+                document.getElementById('avisoTemporizador').style.display = 'none';
+            }
+
+            if (mostrar) {
+                document.body.classList.add('ver-folha-ativa');
+            } else {
+                document.body.classList.remove('ver-folha-ativa');
+            }
+        }
+
+        function mostrarFolhaPor5Segundos() {
+            document.body.classList.add('ver-folha-ativa');
+            const aviso = document.getElementById('avisoTemporizador');
+            const contadorSpan = document.getElementById('segundosRestantes');
+            let tempo = 5;
+
+            aviso.style.display = 'block';
+            contadorSpan.innerText = tempo;
+
+            if (temporizadorRetorno) clearInterval(temporizadorRetorno);
+
+            temporizadorRetorno = setInterval(() => {
+                tempo--;
+                contadorSpan.innerText = tempo;
+                if (tempo <= 0) {
+                    clearInterval(temporizadorRetorno);
+                    temporizadorRetorno = null;
+                    aviso.style.display = 'none';
+                    document.body.classList.remove('ver-folha-ativa');
+                }
+            }, 1000);
+        }
+
+        function mostrarAlertaCampo(mensagem, elementoFocus) {
+            document.getElementById('textoCampoFalta').innerText = mensagem;
+            elementoFocoAposAlerta = elementoFocus;
+            document.getElementById('modalCampoFalta').style.display = 'flex';
+        }
+
+        function fecharModalCampoFalta() {
+            document.getElementById('modalCampoFalta').style.display = 'none';
+            if (elementoFocoAposAlerta) {
+                elementoFocoAposAlerta.focus();
+                elementoFocoAposAlerta = null;
+            }
+        }
+
+        function validarNumeroPositivo(input) { if (input.value < 0) input.value = ''; }
+
+        function validarGasoleo(input) {
+            if (input.value < 0) { input.value = ''; return; }
+            if (parseFloat(input.value) > 950) {
+                document.getElementById('modalLimiteGasoleo').style.display = 'flex';
+                input.value = 950;
+            }
+        }
+
+        function fecharLimiteGasoleo() { 
+            document.getElementById('modalLimiteGasoleo').style.display = 'none'; 
+            
+            const adblueInput = document.getElementById('in_adblue');
+            const adblueVal = adblueInput ? adblueInput.value.trim() : "";
+            const adblueNum = parseFloat(adblueVal) || 0;
+
+            if (adblueVal === "" || adblueNum === 0) {
+                adbluePendenteFluxo = 0;
+                document.getElementById('modalAdblue').style.display = 'flex';
+            } else {
+                adbluePendenteFluxo = adblueNum;
+                verificarDadosCabecalhoEInserir();
+            }
+        }
+
+        function validarAdblue(input) {
+            if (input.value < 0) { input.value = ''; return; }
+            if (parseFloat(input.value) > 80) {
+                document.getElementById('modalLimiteAdblue').style.display = 'flex';
+                input.value = 80;
+            }
+        }
+
+        function fecharLimiteAdblueModal() { 
+            document.getElementById('modalLimiteAdblue').style.display = 'none'; 
+            document.getElementById('in_adblue').focus(); 
+        }
+
+        function validarApenasLetras(input) { input.value = input.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\s-]/g, ''); }
+
+        function aplicarMascaraMatricula(input) {
+            let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            let formatado = "";
+            if (v.length > 0) formatado += v.substring(0, 2);
+            if (v.length > 2) formatado += "-" + v.substring(2, 4);
+            if (v.length > 4) formatado += "-" + v.substring(4, 6);
+            input.value = formatado;
+        }
+
+        function atualizarCorSelect(selectObj) { selectObj.style.color = selectObj.value === "" ? "#94a3b8" : "#334155"; }
+
+        function tratarSelecaoLugar(selectObj) {
+            const inputManual = document.getElementById('in_lugar_manual');
+            const inputEstacao = document.getElementById('in_estacao');
+            const inputCartao = document.getElementById('in_cartao');
+            const valor = selectObj.value;
+
+            atualizarCorSelect(selectObj);
+
+            if (valor === 'Badajoz') {
+                inputEstacao.value = 'Nakanoil';
+                inputCartao.value = 'Nakanoil';
+            } else if (valor === 'Vila Franca') {
+                inputEstacao.value = 'Qfuel';
+                inputCartao.value = 'Nakanoil';
+            } else if (valor === 'Salamanca') {
+                inputEstacao.value = 'Gasoliva';
+                inputCartao.value = 'Nakanoil';
+            } else if (valor === 'Castelo Branco' || valor === 'Proença-a-Nova') {
+                inputEstacao.value = 'José Lourenço';
+                inputCartao.value = 'José Lourenço';
+            }
+
+            if (valor === 'OUTRO') {
+                inputManual.style.display = 'block';
+                inputManual.focus();
+                inputEstacao.value = '';
+                inputCartao.value = '';
+            } else {
+                inputManual.style.display = 'none';
+                inputManual.value = '';
+            }
+        }
+
+        function obterLugarEscolhido() {
+            const select = document.getElementById('in_lugar_select');
+            if (select.value === 'OUTRO') {
+                return document.getElementById('in_lugar_manual').value.trim().toUpperCase();
+            }
+            return select.value;
+        }
+
+        function registarViagem() {
+            const data = document.getElementById('in_data').value;
+            const lugar = obterLugarEscolhido();
+            const estacao = document.getElementById('in_estacao').value.trim().toUpperCase();
+            const cartao = document.getElementById('in_cartao').value.trim();
+            const kms = document.getElementById('in_kms').value.trim();
+            const gasoleo = document.getElementById('in_gasoleo').value.trim();
+            const adblueInput = document.getElementById('in_adblue');
+            const adblueVal = adblueInput.value.trim();
+
+            if (!data) { mostrarAlertaCampo("Por favor, selecione a data.", document.getElementById('in_data')); return; }
+            if (!lugar) { mostrarAlertaCampo("Por favor, selecione ou indique o lugar.", document.getElementById('in_lugar_select')); return; }
+            if (!estacao) { mostrarAlertaCampo("Por favor, insira o posto de gasolina.", document.getElementById('in_estacao')); return; }
+            if (!cartao) { mostrarAlertaCampo("Por favor, insira o número do cartão.", document.getElementById('in_cartao')); return; }
+            if (!kms) { mostrarAlertaCampo("Por favor, insira os quilómetros atuais.", document.getElementById('in_kms')); return; }
+            if (!gasoleo) { mostrarAlertaCampo("Por favor, insira a quantidade de gasóleo.", document.getElementById('in_gasoleo')); return; }
+
+            if (adblueVal === "" || parseFloat(adblueVal) === 0) {
+                adbluePendenteFluxo = 0;
+                document.getElementById('modalAdblue').style.display = 'flex';
+            } else {
+                adbluePendenteFluxo = parseFloat(adblueVal);
+                verificarDadosCabecalhoEInserir();
+            }
+        }
+
+        function respostaAdblue(sim) {
+            document.getElementById('modalAdblue').style.display = 'none';
+            if (sim) {
+                const adblueInput = document.getElementById('in_adblue');
+                const adblueAtual = parseFloat(adblueInput.value) || 0;
+                
+                if (adblueAtual === 0) {
+                    adblueInput.focus();
+                    mostrarAlertaCampo("Por favor, insira os litros de Adblue.", adblueInput);
+                } else {
+                    adbluePendenteFluxo = adblueAtual;
+                    verificarDadosCabecalhoEInserir();
+                }
+            } else {
+                adbluePendenteFluxo = 0;
+                verificarDadosCabecalhoEInserir();
+            }
+        }
+
+        function verificarDadosCabecalhoEInserir() {
+            const assinatura = document.getElementById('txt_assinatura').value.trim();
+            const matricula = document.getElementById('txt_matricula').value.trim();
+
+            if (!assinatura) {
+                document.getElementById('inputModalAssinatura').value = document.getElementById('txt_assinatura').value;
+                document.getElementById('modalPedirAssinatura').style.display = 'flex';
+                return;
+            }
+
+            if (!matricula) {
+                document.getElementById('inputModalMatricula').value = document.getElementById('txt_matricula').value;
+                document.getElementById('modalPedirMatricula').style.display = 'flex';
+                return;
+            }
+
+            processarInsercaoFinal();
+        }
+
+        function confirmarModalAssinatura() {
+            const val = document.getElementById('inputModalAssinatura').value.trim().toUpperCase();
+            if (!val) return;
+            document.getElementById('txt_assinatura').value = val;
+            document.getElementById('modalPedirAssinatura').style.display = 'none';
+            verificarDadosCabecalhoEInserir();
+        }
+
+        function confirmarModalMatricula() {
+            const val = document.getElementById('inputModalMatricula').value.trim().toUpperCase();
+            if (!val) return;
+            document.getElementById('txt_matricula').value = val;
+            document.getElementById('modalPedirMatricula').style.display = 'none';
+            verificarDadosCabecalhoEInserir();
+        }
+
+        function processarInsercaoFinal() {
+            const dataVal = document.getElementById('in_data').value;
+            const [ano, mes, dia] = dataVal.split('-');
+            const dataFormatada = `${dia}/${mes}`;
+
+            const lugar = obterLugarEscolhido();
+            const estacao = document.getElementById('in_estacao').value.trim().toUpperCase();
+            const cartao = document.getElementById('in_cartao').value.trim().toUpperCase();
+            const kms = parseFloat(document.getElementById('in_kms').value);
+            const gasoleo = parseFloat(document.getElementById('in_gasoleo').value);
+            const adblue = adbluePendenteFluxo;
+
+            const ultimosKmsInput = document.getElementById('head_ultimos_kms');
+            const ultimoKmRegistado = parseFloat(ultimosKmsInput.value) || 0;
+
+            if (ultimoKmRegistado > 0 && kms <= ultimoKmRegistado) {
+                document.getElementById('textoErroKms').innerText = `Erro: Os KMS inseridos (${kms}) devem ser superiores aos últimos KMS registados (${ultimoKmRegistado}).`;
+                document.getElementById('modalErroKms').style.display = 'flex';
+                return;
+            }
+
+            const novoItem = {
+                data: dataFormatada,
+                lugar: lugar,
+                estacao: estacao,
+                cartao: cartao,
+                adblue: adblue > 0 ? adblue : "",
+                gasoleo: gasoleo,
+                preco: "",
+                total: "",
+                kms: kms,
+                media: "",
+                obs: ""
+            };
+
+            dadosPreenchidos.push(novoItem);
+            ultimosKmsInput.value = kms;
+
+            limparFormularioEntrada();
+            renderizarTabela();
+            gravarDados();
+            mostrarFolhaPor5Segundos();
+        }
+
+        function limparFormularioEntrada() {
+            definirDataAtual();
+            document.getElementById('in_lugar_select').value = "";
+            atualizarCorSelect(document.getElementById('in_lugar_select'));
+            document.getElementById('in_lugar_manual').style.display = 'none';
+            document.getElementById('in_lugar_manual').value = '';
+            document.getElementById('in_estacao').value = '';
+            document.getElementById('in_cartao').value = '';
+            document.getElementById('in_kms').value = '';
+            document.getElementById('in_gasoleo').value = '';
+            document.getElementById('in_adblue').value = '';
+            adbluePendenteFluxo = 0;
+        }
+
+        function renderizarTabela() {
+            const tbody = document.querySelector('#tabelaOriginal tbody');
+            tbody.innerHTML = '';
+
+            for (let i = 0; i < TOTAL_LINHAS; i++) {
+                const tr = document.createElement('tr');
+                const item = dadosPreenchidos[i] || {};
+
+                tr.innerHTML = `
+                    <td>${item.data !== undefined ? item.data : ''}</td>
+                    <td>${item.lugar !== undefined ? item.lugar : ''}</td>
+                    <td>${item.estacao !== undefined ? item.estacao : ''}</td>
+                    <td>${item.cartao !== undefined ? item.cartao : ''}</td>
+                    <td>${item.adblue !== undefined ? item.adblue : ''}</td>
+                    <td>${item.gasoleo !== undefined ? item.gasoleo : ''}</td>
+                    <td>${item.preco !== undefined ? item.preco : ''}</td>
+                    <td>${item.total !== undefined ? item.total : ''}</td>
+                    <td>${item.kms !== undefined ? item.kms : ''}</td>
+                    <td>${item.media !== undefined ? item.media : ''}</td>
+                    <td>${item.obs !== undefined ? item.obs : ''}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function apagarUltimaLinha() {
+            if (dadosPreenchidos.length === 0) {
+                document.getElementById('modalSemLinhas').style.display = 'flex';
+                return;
+            }
+            const removido = dadosPreenchidos.pop();
+            pilhaHistoricoRemocoes.push(removido);
+
+            if (dadosPreenchidos.length > 0) {
+                document.getElementById('head_ultimos_kms').value = dadosPreenchidos[dadosPreenchidos.length - 1].kms;
+            } else {
+                document.getElementById('head_ultimos_kms').value = '';
+            }
+
+            renderizarTabela();
+            gravarDados();
+        }
+
+        function voltarInsercao() {
+            if (pilhaHistoricoRemocoes.length === 0) {
+                document.getElementById('modalSemHistorico').style.display = 'flex';
+                return;
+            }
+            const reposto = pilhaHistoricoRemocoes.pop();
+            dadosPreenchidos.push(reposto);
+            document.getElementById('head_ultimos_kms').value = reposto.kms;
+
+            renderizarTabela();
+            gravarDados();
+        }
+
+        function gerirLimpezaCiclo() {
+            if (!folhaApagadaEstado) {
+                if (dadosPreenchidos.length === 0 && !document.getElementById('txt_assinatura').value && !document.getElementById('txt_matricula').value) {
+                    document.getElementById('modalSemLinhas').style.display = 'flex';
+                    return;
+                }
+                document.getElementById('modalLimpar').style.display = 'flex';
+            } else {
+                restaurarFolhaLimpa();
+            }
+        }
+
+        function respostaLimpar(sim) {
+            document.getElementById('modalLimpar').style.display = 'none';
+            if (sim) {
+                estadoBackupAntesLimpeza = {
+                    dados: JSON.parse(JSON.stringify(dadosPreenchidos)),
+                    assinatura: document.getElementById('txt_assinatura').value,
+                    matricula: document.getElementById('txt_matricula').value,
+                    ultimosKms: document.getElementById('head_ultimos_kms').value,
+                    mesAno: document.getElementById('txt_mes_atual').value
+                };
+
+                dadosPreenchidos = [];
+                pilhaHistoricoRemocoes = [];
+                document.getElementById('txt_assinatura').value = '';
+                document.getElementById('txt_matricula').value = '';
+                document.getElementById('head_ultimos_kms').value = '';
+                document.getElementById('txt_mes_atual').value = '';
+
+                renderizarTabela();
+                gravarDados();
+
+                folhaApagadaEstado = true;
+                const btnLimpar = document.getElementById('btn_toggle_limpar');
+                btnLimpar.innerText = "Restaurar";
+                btnLimpar.className = "btn-a4 btn-a4-verde";
+            }
+        }
+
+        function restaurarFolhaLimpa() {
+            if (estadoBackupAntesLimpeza) {
+                dadosPreenchidos = estadoBackupAntesLimpeza.dados;
+                document.getElementById('txt_assinatura').value = estadoBackupAntesLimpeza.assinatura;
+                document.getElementById('txt_matricula').value = estadoBackupAntesLimpeza.matricula;
+                document.getElementById('head_ultimos_kms').value = estadoBackupAntesLimpeza.ultimosKms;
+                document.getElementById('txt_mes_atual').value = estadoBackupAntesLimpeza.mesAno;
+                renderizarTabela();
+                gravarDados();
+            }
+            folhaApagadaEstado = false;
+            const btnLimpar = document.getElementById('btn_toggle_limpar');
+            btnLimpar.innerText = "Apagar tudo";
+            btnLimpar.className = "btn-a4 btn-a4-apagar";
+            estadoBackupAntesLimpeza = null;
+        }
+
+        function gravarDados() {
+            if (atualizandoRemotamente) return;
+            const payload = {
+                dados: dadosPreenchidos,
+                assinatura: document.getElementById('txt_assinatura').value,
+                matricula: document.getElementById('txt_matricula').value,
+                ultimosKms: document.getElementById('head_ultimos_kms').value,
+                mesAno: document.getElementById('txt_mes_atual').value,
+                fonte: document.body.className
+            };
+            dbRef.set(payload).catch(err => console.error("Erro ao gravar:", err));
+        }
+
+        function gravarDadosAutomatico() {
+            gravarDados();
+        }
+
+        function atualizarUltimosKmsAutomatico() {
+            gravarDados();
+        }
+
+        function imprimirFolha() {
+            window.print();
+        }
+
+        function fecharAvisoAdblue() { document.getElementById('modalAvisoAdblue').style.display = 'none'; }
+        function fecharErroKms() { document.getElementById('modalErroKms').style.display = 'none'; document.getElementById('in_kms').focus(); }
+        function fecharSemLinhas() { document.getElementById('modalSemLinhas').style.display = 'none'; }
+        function fecharSemHistorico() { document.getElementById('modalSemHistorico').style.display = 'none'; }
+        function fecharAlertaMudancaMes() { document.getElementById('modalAlertaMudancaMes').style.display = 'none'; }
+
+        window.onload = function() {
+            definirDataAtual();
+            
+            dbRef.on('value', (snapshot) => {
+                const val = snapshot.val();
+                if (val) {
+                    atualizandoRemotamente = true;
+                    
+                    if (val.dados) {
+                        dadosPreenchidos = Array.isArray(val.dados) ? val.dados : Object.values(val.dados);
+                    } else {
+                        dadosPreenchidos = [];
+                    }
+
+                    if (val.assinatura !== undefined) document.getElementById('txt_assinatura').value = val.assinatura;
+                    if (val.matricula !== undefined) document.getElementById('txt_matricula').value = val.matricula;
+                    if (val.ultimosKms !== undefined) document.getElementById('head_ultimos_kms').value = val.ultimosKms;
+                    
+                    if (val.mesAno) {
+                        document.getElementById('txt_mes_atual').value = val.mesAno;
+                    } else {
+                        const mesAtualSugerido = obterMesAnoAtualFormatado();
+                        document.getElementById('txt_mes_atual').value = mesAtualSugerido;
+                    }
+
+                    if (val.fonte) {
+                        document.body.className = val.fonte;
+                        document.getElementById('select_fonte').value = val.fonte;
+                    }
+
+                    renderizarTabela();
+                    atualizandoRemotamente = false;
+                } else {
+                    document.getElementById('txt_mes_atual').value = obterMesAnoAtualFormatado();
+                    dadosPreenchidos = [];
+                    renderizarTabela();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
